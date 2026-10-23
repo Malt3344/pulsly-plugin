@@ -1,0 +1,10 @@
+{
+  "name": "pulsly",
+  "version": "1.0.0",
+  "description": "Turn an idea into a motion-graphics reel with your own Claude and a free voice, then post it to TikTok, Instagram, Facebook and YouTube with Pulsly.",
+  "author": {
+    "name": "Pulsly",
+    "url": "https://pulsly.co"
+  },
+  "homepage": "https://pulsly.co"
+}

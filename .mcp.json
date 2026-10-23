@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "pulsly": {
+      "type": "http",
+      "url": "https://api.pulsly.co/mcp"
+    }
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "name": "pulsly",
+  "description": "Make motion-graphics reels with Claude Code and post them everywhere with Pulsly.",
+  "owner": {
+    "name": "Pulsly",
+    "url": "https://pulsly.co"
+  },
+  "plugins": [
+    {
+      "name": "pulsly",
+      "source": ".",
+      "description": "Make motion-graphics reels and post them to every channel with Pulsly."
+    }
+  ]
+}

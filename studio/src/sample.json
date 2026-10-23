@@ -1,0 +1,58 @@
+{
+  "accent": "#3fe0b0",
+  "scenes": [
+    {
+      "start": 0,
+      "end": 3.2,
+      "title": { "text": "Stop selling AI tools. Sell the job.", "highlight": ["the", "job."] }
+    },
+    {
+      "start": 3.2,
+      "end": 6.8,
+      "title": { "text": "Nobody wants another software company", "highlight": ["software"] },
+      "visuals": [
+        { "type": "tag", "label": "software company" },
+        { "type": "sticker", "name": "services firm" }
+      ]
+    },
+    {
+      "start": 6.8,
+      "end": 11,
+      "title": { "text": "Your agents do the work", "highlight": ["work"] },
+      "visuals": [
+        {
+          "type": "terminal",
+          "header": "MONTHEND · OPS",
+          "status": "AGENTS RUNNING · 4",
+          "lines": [
+            { "text": "screened 212 applicants", "time": "00:41" },
+            { "text": "reconciled 1,840 invoices", "time": "02:13" },
+            { "text": "booked 9 sales calls", "time": "03:05" },
+            { "text": "drafted board report", "time": "04:22", "badge": "LIVE" }
+          ]
+        }
+      ]
+    },
+    {
+      "start": 11,
+      "end": 14,
+      "title": { "text": "Charge for outcomes", "highlight": ["outcomes"] },
+      "visuals": [
+        {
+          "type": "stat",
+          "value": 12,
+          "prefix": "$",
+          "suffix": "k",
+          "label": "per client, per month"
+        }
+      ]
+    },
+    {
+      "start": 14,
+      "end": 17.5,
+      "visuals": [
+        { "type": "cta", "keyword": "JOB", "text": "and I'll send you the exact playbook" }
+      ]
+    }
+  ]
+}
