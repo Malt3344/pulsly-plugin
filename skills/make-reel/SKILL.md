@@ -57,7 +57,8 @@ scene's `start` is the `start` of its first word; its `end` is the `start` of th
 last scene ends 0.4 s after the last word). Scenes must not overlap or leave gaps.
 
 Write `pulsly-studio/public/videos/<slug>/video.json`. Do not add `audio` or `words`; the render
-script adds them.
+script adds them. Set `"style": "light"` for a clean, bright look (pair it with a darker accent such
+as `#2563eb`) or leave it out for the default dark style.
 
 ```json
 {
@@ -134,3 +135,16 @@ posting.
    TikTok requires them to choose the post's visibility in Pulsly before it can go out.
 
 Use `list_posts` to check on progress when the user asks.
+
+## A batch of videos
+
+When the user asks for several videos (for example "a week of explainer videos about my
+product"):
+
+1. Ask once for what the videos are about (product, audience, offer), the channels and the
+   posting time, and whether to use the `dark` or `light` style.
+2. Propose one idea per video as a numbered list of hooks and get a single go-ahead.
+3. Make each video with steps 2–5, one slug per video (e.g. `week-1-mon`). Show the scripts
+   together for one approval instead of stopping for each.
+4. Schedule them one per day at the chosen time with `schedule_post`, then report the
+   schedule as a short list (day, hook, channels).

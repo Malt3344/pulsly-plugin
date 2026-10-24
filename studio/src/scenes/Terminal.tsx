@@ -1,7 +1,7 @@
 import { useCurrentFrame } from 'remotion';
 import { popIn, useEntrance } from '../components/animation';
 import type { Visual } from '../schema';
-import { colors, fonts } from '../theme';
+import { fonts, usePalette } from '../theme';
 
 type TerminalSpec = Extract<Visual, { type: 'terminal' }>;
 
@@ -17,6 +17,7 @@ export function Terminal({
   accent: string;
   delay: number;
 }) {
+  const colors = usePalette();
   const frame = useCurrentFrame();
   const progress = useEntrance(delay);
   const visibleLines = Math.max(0, Math.floor((frame - delay - 6) / LINE_INTERVAL) + 1);
@@ -30,7 +31,7 @@ export function Terminal({
         borderRadius: 26,
         background: colors.panel,
         border: `2px solid ${colors.panelBorder}`,
-        boxShadow: '0 30px 80px rgba(0,0,0,0.6)',
+        boxShadow: `0 30px 80px ${colors.shadow}`,
         fontFamily: fonts.mono,
         fontSize: 32,
         color: colors.text,

@@ -1,8 +1,9 @@
 import { popIn, useEntrance } from '../components/animation';
-import { colors, fonts } from '../theme';
+import { fonts, usePalette } from '../theme';
 
 /** Small glowing chip, e.g. "● software company". */
 export function Tag({ label, accent, delay }: { label: string; accent: string; delay: number }) {
+  const colors = usePalette();
   const progress = useEntrance(delay);
 
   return (

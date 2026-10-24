@@ -1,6 +1,6 @@
 import { useCurrentFrame, useVideoConfig, spring } from 'remotion';
 import type { Title as TitleSpec, Word } from '../schema';
-import { colors, fonts } from '../theme';
+import { fonts, textOn, usePalette } from '../theme';
 
 const normalize = (word: string) => word.toLowerCase().replace(/[^\p{L}\p{N}]/gu, '');
 
@@ -16,6 +16,7 @@ interface TitleProps {
  * in accent pills, the signature look of the style.
  */
 export function Title({ title, accent, spoken }: TitleProps) {
+  const colors = usePalette();
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const highlights = new Set(title.highlight.map(normalize));
@@ -37,7 +38,7 @@ export function Title({ title, accent, spoken }: TitleProps) {
         justifyContent: 'center',
         columnGap: 22,
         rowGap: 14,
-        textShadow: '0 6px 40px rgba(0,0,0,0.6)',
+        textShadow: colors.titleShadow,
       }}
     >
       {tokens.map((token, index) => {
@@ -60,7 +61,7 @@ export function Title({ title, accent, spoken }: TitleProps) {
               transform: `translateY(${(1 - progress) * 34}px) scale(${0.85 + progress * 0.15})`,
               ...(isHighlight && {
                 background: accent,
-                color: colors.ink,
+                color: textOn(accent),
                 borderRadius: 18,
                 padding: '0 18px 6px',
                 boxShadow: `0 0 50px ${accent}55`,

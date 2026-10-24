@@ -1,5 +1,5 @@
 import { popIn, useEntrance } from '../components/animation';
-import { colors, fonts } from '../theme';
+import { fonts, textOn, usePalette } from '../theme';
 
 const ITEM_INTERVAL = 8;
 
@@ -15,7 +15,7 @@ function ChecklistItem({ text, accent, delay }: { text: string; accent: string; 
           flexShrink: 0,
           borderRadius: 999,
           background: accent,
-          color: colors.ink,
+          color: textOn(accent),
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -40,6 +40,7 @@ export function Checklist({
   accent: string;
   delay: number;
 }) {
+  const colors = usePalette();
   return (
     <div
       style={{

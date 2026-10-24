@@ -1,6 +1,6 @@
 import { popIn, useEntrance } from '../components/animation';
 import type { Visual } from '../schema';
-import { colors, fonts } from '../theme';
+import { fonts, textOn } from '../theme';
 
 type StickerSpec = Extract<Visual, { type: 'sticker' }>;
 
@@ -41,7 +41,7 @@ export function Sticker({
         <div style={{ fontSize: 120, fontWeight: 800, lineHeight: 1, letterSpacing: '-0.04em' }}>
           {spec.top}
         </div>
-        <div style={{ fontSize: 46, fontWeight: 700, color: colors.ink }}>{spec.subtitle}</div>
+        <div style={{ fontSize: 46, fontWeight: 700, color: textOn(accent) }}>{spec.subtitle}</div>
       </div>
       <div
         style={{

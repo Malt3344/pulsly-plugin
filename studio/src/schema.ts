@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { STYLES } from './theme';
 
 /** A spoken word with its time in seconds, from the voiceover. */
 export const wordSchema = z.object({
@@ -80,8 +81,13 @@ export const sceneSchema = z
 export const videoSchema = z.object({
   /** Voiceover file inside public/, e.g. "videos/my-reel/voice.wav". */
   audio: z.string().optional(),
-  /** Accent colour for highlights, badges and glow. */
-  accent: z.string().default('#3fe0b0'),
+  /** `dark` (near-black) or `light` (clean off-white). */
+  style: z.enum(STYLES).default('dark'),
+  /** Accent colour for highlights, badges and glow, as #rrggbb. */
+  accent: z
+    .string()
+    .regex(/^#[0-9a-fA-F]{6}$/)
+    .default('#3fe0b0'),
   words: z.array(wordSchema).default([]),
   scenes: z.array(sceneSchema).min(1),
 });

@@ -11,6 +11,7 @@ import { Background } from './components/Background';
 import { Title } from './components/Title';
 import { Visual } from './scenes/Visual';
 import type { Scene as SceneSpec, Video, Word } from './schema';
+import { PaletteProvider, palettes } from './theme';
 
 /** Frames between visuals in the same scene, so they land one after another. */
 const VISUAL_STAGGER = 8;
@@ -69,11 +70,11 @@ const wordsIn = (words: Word[], { start, end }: SceneSpec) =>
     .filter((word) => word.start >= start && word.start < end)
     .map((word) => ({ ...word, start: word.start - start, end: word.end - start }));
 
-export function Reel({ audio, accent, words, scenes }: Video) {
+export function Reel({ audio, style, accent, words, scenes }: Video) {
   const { fps } = useVideoConfig();
 
   return (
-    <AbsoluteFill>
+    <PaletteProvider value={palettes[style]}>
       <Background accent={accent} />
       {audio && <Audio src={staticFile(audio)} />}
       {scenes.map((scene) => (
@@ -85,6 +86,6 @@ export function Reel({ audio, accent, words, scenes }: Video) {
           <Scene scene={scene} accent={accent} spoken={wordsIn(words, scene)} />
         </Sequence>
       ))}
-    </AbsoluteFill>
+    </PaletteProvider>
   );
 }

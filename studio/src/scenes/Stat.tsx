@@ -1,7 +1,7 @@
 import { interpolate, useCurrentFrame } from 'remotion';
 import { popIn, useEntrance } from '../components/animation';
 import type { Visual } from '../schema';
-import { colors, fonts } from '../theme';
+import { fonts, usePalette } from '../theme';
 
 type StatSpec = Extract<Visual, { type: 'stat' }>;
 
@@ -9,6 +9,7 @@ const COUNT_FRAMES = 24;
 
 /** A big number that counts up, with a label underneath. */
 export function Stat({ spec, accent, delay }: { spec: StatSpec; accent: string; delay: number }) {
+  const colors = usePalette();
   const frame = useCurrentFrame();
   const progress = useEntrance(delay);
   const value = interpolate(frame - delay, [0, COUNT_FRAMES], [0, spec.value], {

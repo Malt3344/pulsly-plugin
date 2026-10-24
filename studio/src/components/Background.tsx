@@ -1,8 +1,9 @@
 import { AbsoluteFill, interpolate, useCurrentFrame } from 'remotion';
-import { colors } from '../theme';
+import { usePalette } from '../theme';
 
 /** Near-black backdrop with a faint grid and a slowly drifting accent glow. */
 export function Background({ accent }: { accent: string }) {
+  const colors = usePalette();
   const frame = useCurrentFrame();
   const drift = interpolate(Math.sin(frame / 90), [-1, 1], [-60, 60]);
 
@@ -10,8 +11,7 @@ export function Background({ accent }: { accent: string }) {
     <AbsoluteFill style={{ backgroundColor: colors.background }}>
       <AbsoluteFill
         style={{
-          backgroundImage:
-            'linear-gradient(rgba(255,255,255,0.035) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.035) 1px, transparent 1px)',
+          backgroundImage: `linear-gradient(${colors.grid} 1px, transparent 1px), linear-gradient(90deg, ${colors.grid} 1px, transparent 1px)`,
           backgroundSize: '72px 72px',
           maskImage: 'radial-gradient(ellipse at 50% 45%, black 20%, transparent 75%)',
         }}
@@ -23,7 +23,7 @@ export function Background({ accent }: { accent: string }) {
       />
       <AbsoluteFill
         style={{
-          background: 'radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,0.75) 100%)',
+          background: `radial-gradient(ellipse at center, transparent 55%, ${colors.vignette} 100%)`,
         }}
       />
     </AbsoluteFill>

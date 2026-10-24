@@ -1,6 +1,6 @@
 import { popIn, useEntrance } from '../components/animation';
 import type { Visual } from '../schema';
-import { colors, fonts } from '../theme';
+import { fonts, textOn, usePalette } from '../theme';
 
 type CtaSpec = Extract<Visual, { type: 'cta' }>;
 
@@ -14,6 +14,7 @@ export function CallToAction({
   accent: string;
   delay: number;
 }) {
+  const colors = usePalette();
   const progress = useEntrance(delay, 10);
 
   return (
@@ -33,7 +34,7 @@ export function CallToAction({
           padding: '10px 60px 22px',
           borderRadius: 34,
           background: accent,
-          color: colors.ink,
+          color: textOn(accent),
           fontSize: 200,
           fontWeight: 800,
           letterSpacing: '-0.04em',
