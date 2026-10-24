@@ -148,3 +148,16 @@ product"):
    together for one approval instead of stopping for each.
 4. Schedule them one per day at the chosen time with `schedule_post`, then report the
    schedule as a short list (day, hook, channels).
+
+## Autopilot
+
+A request that starts with `autopilot:` comes from a scheduled run with nobody watching
+(set up on the Videos page in Pulsly). Then:
+
+- Never ask questions or wait for approval; the checkpoints in steps 2 and 5 are skipped.
+- Use the channels, style, number of videos and posting time from the request. Pick a fresh
+  angle for each video: check `list_posts` and avoid repeating recent hooks.
+- Set up the studio if `./pulsly-studio` does not exist yet.
+- Schedule every video as asked. TikTok channels come back as drafts; that is expected.
+- End with a short summary (day, hook, channels) so the log shows what was made. If something
+  fails, stop and explain it in the log instead of retrying endlessly.
