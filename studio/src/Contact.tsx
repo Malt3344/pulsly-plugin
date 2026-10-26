@@ -1,71 +1,84 @@
+import type { ComponentType } from 'react';
 import { AbsoluteFill, Freeze } from 'remotion';
-import { Reel } from './Reel';
-import type { Video } from './schema';
-import { FPS, HEIGHT, WIDTH, fonts } from './theme';
+import { fonts, FPS, HEIGHT, WIDTH } from './kit/theme';
+import type { VideoProps } from './kit/Video';
 
-export const CONTACT_COLUMNS = 5;
-export const TILE_SCALE = 0.25;
-export const TILE_WIDTH = WIDTH * TILE_SCALE;
-export const TILE_HEIGHT = HEIGHT * TILE_SCALE;
-export const LABEL_HEIGHT = 44;
-export const GAP = 16;
+export const COLUMNS = 6;
+export const PER_PAGE = 18;
+const SCALE = 0.2;
+export const TILE_WIDTH = WIDTH * SCALE;
+export const TILE_HEIGHT = HEIGHT * SCALE;
+export const LABEL = 34;
+export const GAP = 12;
 
-/** The frame where a scene has settled: 85% of the way through it. */
-const settledFrame = ({ start, end }: Video['scenes'][number]) =>
-  Math.round((start + (end - start) * 0.85) * FPS);
+export interface ContactProps extends VideoProps {
+  /** Seconds between stills. */
+  interval: number;
+  page: number;
+  durationInSeconds: number;
+}
 
-/** One still per scene in a grid, so the whole video can be checked at a glance. */
-export function Contact(video: Video) {
-  return (
-    <AbsoluteFill
-      style={{
-        background: '#1a1a1a',
-        padding: GAP,
-        display: 'flex',
-        flexDirection: 'row',
-        flexWrap: 'wrap',
-        alignContent: 'flex-start',
-        gap: GAP,
-        fontFamily: fonts.sans,
-      }}
-    >
-      {video.scenes.map((scene, index) => (
-        <div key={scene.start} style={{ width: TILE_WIDTH }}>
-          <div
-            style={{
-              position: 'relative',
-              width: TILE_WIDTH,
-              height: TILE_HEIGHT,
-              overflow: 'hidden',
-              borderRadius: 10,
-            }}
-          >
+/**
+ * Stills every `interval` seconds in a grid, so Claude can check the motion of
+ * the whole video: if two neighbouring tiles look the same, nothing happened.
+ */
+export function makeContact(VideoComponent: ComponentType<VideoProps>) {
+  return function Contact(props: ContactProps) {
+    const { interval, page, durationInSeconds } = props;
+    const times = Array.from(
+      { length: Math.floor(durationInSeconds / interval) + 1 },
+      (_, index) => index * interval,
+    ).slice((page - 1) * PER_PAGE, page * PER_PAGE);
+
+    return (
+      <AbsoluteFill
+        style={{
+          background: '#1a1a1a',
+          padding: GAP,
+          flexDirection: 'row',
+          flexWrap: 'wrap',
+          alignContent: 'flex-start',
+          gap: GAP,
+          fontFamily: fonts.sans,
+        }}
+      >
+        {times.map((seconds) => (
+          <div key={seconds} style={{ width: TILE_WIDTH }}>
             <div
               style={{
-                width: WIDTH,
-                height: HEIGHT,
-                transform: `scale(${TILE_SCALE})`,
-                transformOrigin: 'top left',
+                width: TILE_WIDTH,
+                height: TILE_HEIGHT,
+                overflow: 'hidden',
+                borderRadius: 8,
               }}
             >
-              <Freeze frame={settledFrame(scene)}>
-                <Reel {...video} audio={undefined} />
-              </Freeze>
+              <div
+                style={{
+                  width: WIDTH,
+                  height: HEIGHT,
+                  transform: `scale(${SCALE})`,
+                  transformOrigin: 'top left',
+                }}
+              >
+                <Freeze frame={Math.round(seconds * FPS)}>
+                  <VideoComponent {...props} audio={undefined} music={false} />
+                </Freeze>
+              </div>
             </div>
+            <p
+              style={{
+                margin: 0,
+                height: LABEL,
+                lineHeight: `${LABEL}px`,
+                color: '#d0d0d0',
+                fontSize: 20,
+              }}
+            >
+              {seconds.toFixed(1)}s
+            </p>
           </div>
-          <p
-            style={{
-              margin: 0,
-              height: LABEL_HEIGHT,
-              lineHeight: `${LABEL_HEIGHT}px`,
-              color: '#cfcfcf',
-              fontSize: 18,
-            }}
-          >
-            Scene {index + 1} · {scene.start.toFixed(1)}–{scene.end.toFixed(1)}s
-          </p>
-        </div>
-      ))}
-    </AbsoluteFill>
-  );
+        ))}
+      </AbsoluteFill>
+    );
+  };
 }

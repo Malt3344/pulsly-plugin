@@ -13,7 +13,7 @@ try {
 
 const slug = process.argv[2];
 const voice = process.env.VOICE || 'am_michael';
-const speed = Number(process.env.VOICE_SPEED || 1);
+const speed = Number(process.env.VOICE_SPEED || 1.08);
 
 if (!slug) throw new Error('Usage: npm run voice -- <slug>');
 
@@ -77,6 +77,11 @@ const tts = await KokoroTTS.from_pretrained('onnx-community/Kokoro-82M-v1.0-ONNX
   device: 'cpu',
 });
 
+/** Pause kept between sentences. Kokoro leaves over a second; fast reels leave almost none. */
+const GAP_SECONDS = 0.2;
+/** Lead-in before the first word, so the hook starts at once. */
+const LEAD_SECONDS = 0.05;
+
 const chunks = [];
 const words = [];
 let sampleRate = 24000;
@@ -90,9 +95,20 @@ sentences.close();
 for await (const { text: sentence, audio } of tts.stream(sentences, { voice, speed })) {
   sampleRate = audio.sampling_rate;
   const [first, last] = speechBounds(audio.audio);
-  words.push(...timeWords(sentence, (offset + first) / sampleRate, (offset + last) / sampleRate));
-  chunks.push(audio.audio);
-  offset += audio.audio.length;
+  // Keep only the speech, then add a short, even pause.
+  const pad = Math.round((chunks.length === 0 ? LEAD_SECONDS : GAP_SECONDS) * sampleRate);
+  const speech = audio.audio.slice(first, last + 1);
+  const chunk = new Float32Array(pad + speech.length);
+  chunk.set(speech, pad);
+  words.push(
+    ...timeWords(
+      sentence,
+      (offset + pad) / sampleRate,
+      (offset + pad + speech.length) / sampleRate,
+    ),
+  );
+  chunks.push(chunk);
+  offset += chunk.length;
 }
 
 const samples = new Float32Array(offset);

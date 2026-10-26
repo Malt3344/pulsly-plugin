@@ -26,11 +26,11 @@ Requirements: Claude Code, Node 22+ and a [Pulsly](https://pulsly.co) account. T
 
 ## What's inside
 
-| Path               | What it is                                                        |
-| ------------------ | ----------------------------------------------------------------- |
-| `skills/make-reel` | The workflow: script → voice → scenes → render → post             |
-| `studio`           | Remotion template that renders `video.json` into a 1080×1920 reel |
-| `.mcp.json`        | Connects Claude Code to the Pulsly API (`api.pulsly.co/mcp`)      |
+| Path               | What it is                                                              |
+| ------------------ | ----------------------------------------------------------------------- |
+| `skills/make-reel` | The workflow: script → voice → scenes → render → post                   |
+| `studio`           | Remotion studio and motion kit that turn a script into a 1080×1920 reel |
+| `.mcp.json`        | Connects Claude Code to the Pulsly API (`api.pulsly.co/mcp`)            |
 
 The studio is copied to `./pulsly-studio` the first time you make a reel. Preview and tweak any
 video in the browser with `npm run studio`.

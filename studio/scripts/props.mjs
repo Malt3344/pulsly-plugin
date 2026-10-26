@@ -1,25 +1,37 @@
-// Builds the props for a video: brand.json defaults, then video.json, then the voiceover.
+// Prepares a video for rendering: points src/current.ts at src/videos/<slug>.tsx and
+// writes the props (brand kit, voiceover, word timings) to public/videos/<slug>/.props.json.
 import { existsSync } from 'node:fs';
 import { readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 
 const readJson = async (path) => JSON.parse(await readFile(path, 'utf8'));
 
-/** Writes public/videos/<slug>/.props.json and returns its path. */
-export const writeProps = async (slug) => {
+export const prepare = async (slug) => {
   if (!slug) throw new Error('Pass the video slug, e.g. npm run render -- my-video');
+  if (!existsSync(join('src', 'videos', `${slug}.tsx`))) {
+    throw new Error(`Write the video first: src/videos/${slug}.tsx`);
+  }
+
+  await writeFile(
+    join('src', 'current.ts'),
+    `// The video the scripts render. \`npm run preview/render -- <slug>\` rewrites this line.\nexport { default } from './videos/${slug}';\n`,
+  );
 
   const dir = join('public', 'videos', slug);
-  // The brand kit (style, accent, handle) applies to every video unless video.json overrides it.
-  const brand = existsSync('brand.json') ? await readJson('brand.json') : {};
-  const { style, accent, handle } = brand;
-  const video = { style, accent, handle, ...(await readJson(join(dir, 'video.json'))) };
+  const brandKit = existsSync('brand.json') ? await readJson('brand.json') : {};
+  const props = {
+    slug,
+    brand: {
+      accent: brandKit.accent ?? '#3fe0b0',
+      tone: brandKit.tone ?? brandKit.style ?? 'dark',
+      handle: brandKit.handle,
+    },
+    music: brandKit.music ?? true,
+    audio: existsSync(join(dir, 'voice.wav')) ? `videos/${slug}/voice.wav` : undefined,
+    words: existsSync(join(dir, 'words.json')) ? await readJson(join(dir, 'words.json')) : [],
+  };
+  const path = join(dir, '.props.json');
+  await writeFile(path, JSON.stringify(props));
 
-  if (existsSync(join(dir, 'voice.wav'))) video.audio ??= `videos/${slug}/voice.wav`;
-  if (existsSync(join(dir, 'words.json'))) video.words ??= await readJson(join(dir, 'words.json'));
-
-  const props = join(dir, '.props.json');
-  await writeFile(props, JSON.stringify(video));
-
-  return { dir, props };
+  return { dir, path, props };
 };

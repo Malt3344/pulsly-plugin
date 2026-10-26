@@ -1,23 +1,26 @@
 {
   "name": "pulsly-studio",
-  "version": "1.1.0",
+  "version": "2.0.0",
   "private": true,
   "description": "Renders Pulsly reels from a video.json spec with Remotion",
   "type": "module",
   "scripts": {
+    "postinstall": "node scripts/sounds.mjs",
     "studio": "remotion studio",
     "voice": "node scripts/voice.mjs",
+    "check": "tsc --noEmit",
     "preview": "node scripts/preview.mjs",
-    "render": "node scripts/render.mjs",
-    "check": "tsc --noEmit"
+    "render": "node scripts/render.mjs"
   },
   "dependencies": {
     "@remotion/cli": "4.0.538",
     "@remotion/google-fonts": "4.0.538",
     "kokoro-js": "1.2.1",
+    "lucide-react": "1.52.0",
     "react": "19.2.0",
     "react-dom": "19.2.0",
     "remotion": "4.0.538",
+    "simple-icons": "16.35.0",
     "zod": "4.5.4"
   },
   "devDependencies": {
