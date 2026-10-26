@@ -170,7 +170,10 @@ nothing new happens. Add beats there and render again until the check is clean. 
 the user where the video is (they can fine-tune it with `npm run studio`) and wait for their
 go-ahead before posting.
 
-## 8. Post with Pulsly
+## 8. Send it to Pulsly for review
+
+Videos never go straight to the socials: they wait in Pulsly until the user has watched them
+and pressed approve.
 
 1. `list_channels` and ask which channels to post to (default: all active ones) and when (now or
    a date and time — convert it to ISO 8601 with the user's timezone).
@@ -181,10 +184,10 @@ go-ahead before posting.
    - `complete_media_upload` with the `mediaId`.
 3. Write a caption: the hook as the first line, one or two lines of value, the call to action and
    3–5 relevant hashtags. Write a YouTube title of at most 100 characters (the hook works well).
-4. `schedule_post` with the channel ids, the media id, the caption, the title and `scheduledAt`
-   (omit it to publish now).
-5. Report what was scheduled. If the result has a `tiktokDraft`, give the user the `reviewUrl`:
-   TikTok requires them to choose the post's visibility in Pulsly before it can go out.
+4. `schedule_post` with the channel ids, the media id, the caption, the title and the
+   suggested `scheduledAt` (omit it to suggest "right away").
+5. Give the user the `reviewUrl`: there they watch the video, can change the caption, channels
+   and time (and TikTok's visibility), and press **Approve** to publish or schedule it.
 
 Use `list_posts` to check on progress when the user asks.
 
@@ -198,8 +201,9 @@ product"):
 2. Propose one idea per video as a numbered list of hooks and get a single go-ahead.
 3. Make each video with steps 2–7, one slug per video (e.g. `week-1-mon`). Show the scripts
    together for one approval instead of stopping for each.
-4. Schedule them one per day at the chosen time with `schedule_post`, then report the
-   schedule as a short list (day, hook, channels).
+4. Send them with `schedule_post`, suggesting one per day at the chosen time, then list them
+   (day, hook, review link) and tell the user they are waiting in Pulsly under
+   **Posts → Needs review**.
 
 ## Autopilot
 
@@ -211,6 +215,7 @@ A request that starts with `autopilot:` comes from a scheduled run with nobody w
 - Use the channels, style, number of videos and posting time from the request. Pick a fresh
   angle for each video: check `list_posts` and avoid repeating recent hooks.
 - Set up the studio if `./pulsly-studio` does not exist yet.
-- Schedule every video as asked. TikTok channels come back as drafts; that is expected.
+- Send every video with `schedule_post` at the suggested times. They wait in Pulsly for the
+  user's approval; that is expected.
 - End with a short summary (day, hook, channels) so the log shows what was made. If something
   fails, stop and explain it in the log instead of retrying endlessly.

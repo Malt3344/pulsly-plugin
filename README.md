@@ -37,10 +37,10 @@ video in the browser with `npm run studio`.
 
 ## Pulsly tools
 
-| Tool                    | What it does                                          |
-| ----------------------- | ----------------------------------------------------- |
-| `list_channels`         | Your connected channels                               |
-| `create_media_upload`   | Returns a URL to upload a video or image to           |
-| `complete_media_upload` | Confirms the upload                                   |
-| `schedule_post`         | Publishes now or at a set time to the chosen channels |
-| `list_posts`            | Recent posts and their status per channel             |
+| Tool                    | What it does                                                             |
+| ----------------------- | ------------------------------------------------------------------------ |
+| `list_channels`         | Your connected channels                                                  |
+| `create_media_upload`   | Returns a URL to upload a video or image to                              |
+| `complete_media_upload` | Confirms the upload                                                      |
+| `schedule_post`         | Sends a video to Pulsly for you to watch and approve before it is posted |
+| `list_posts`            | Recent posts and their status per channel                                |
