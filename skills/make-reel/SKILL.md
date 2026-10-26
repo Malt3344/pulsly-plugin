@@ -58,10 +58,14 @@ Pick a short slug (e.g. `sell-the-job`). Write the voiceover to
 `pulsly-studio/public/videos/<slug>/script.txt` and show it to the user.
 
 - **Length:** 35–60 seconds for an explainer (110–170 words); 20–30 seconds for a quick tip.
-- **Hook in the first second:** the first five words decide everything. Patterns:
+- **Hook in the first second:** the first frame is the thumbnail and the first five words
+  decide everything. Open with chaos or a contrast on screen (notifications flooding in, a
+  number exploding, something being crossed out), never a calm title. Patterns:
   reversal ("Stop selling AI tools. Sell the job."), enemy ("Posting to four apps is
   killing your week."), specific result ("5 million views in 35 days."), secret ("The
   secret isn't Claude."), mistake ("The pricing mistake almost every SaaS makes.").
+- **Keep an open loop:** promise the payoff early ("…and the third one is the one nobody
+  uses") and pay it off late. Add a twist halfway ("But here's the catch").
 - **Structure:** hook → the problem in the viewer's words → the insight (one idea) →
   proof (numbers, a customer, the product on screen) → how (2–3 concrete steps) → one call
   to action on a keyword ("Comment POST and I'll send you the setup").
@@ -130,6 +134,11 @@ export default function SellTheJob(props: VideoProps) {
   `on={{ word: 'four', nth: 2 }}`, plus `delay` in frames (30 per second) to stagger.
 - The first frame is the thumbnail: the first shot must show a strong visual at once (no
   `on` on its main element).
+- Each shot's main object is on screen as the shot cuts in; cue the _changes_ to it, not
+  the object itself. Shots cut in over each other full screen (`push`, `zoom`, `wipe`,
+  `whip`, rotating by default) with a whoosh, so don't add your own fades.
+- One focal motion at a time: stagger beats with `delay` instead of moving everything at
+  once, so the eye always knows where to look.
 - You can write your own small components and SVG drawings in the file for custom
   illustrations; use `useCue` for timing and `useColors` for colours.
 

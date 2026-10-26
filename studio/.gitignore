@@ -3,5 +3,4 @@ node_modules
 brand.json
 public/videos/*
 !public/videos/.gitkeep
-public/sfx
 public/music

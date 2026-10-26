@@ -8,7 +8,7 @@ import {
   useVideoConfig,
 } from 'remotion';
 import { BrandProvider, fonts, palettes, type Brand } from './theme';
-import { Shot, TAIL_SECONDS, type ShotProps } from './Shot';
+import { Shot, TAIL_SECONDS, TRANSITION_FRAMES, type ShotProps } from './Shot';
 import { findCueTime, WordsProvider, type Word } from './timing';
 
 /** Everything the scripts pass in: the voiceover, its word timings and the brand kit. */
@@ -106,7 +106,13 @@ const timeShots = (children: ReactNode, words: Word[]) => {
   });
 
   return shots.map((shot, index) =>
-    cloneElement(shot, { start: starts[index], end: starts[index + 1] ?? videoEnd }),
+    cloneElement(shot, {
+      start: starts[index],
+      end: starts[index + 1] ?? videoEnd,
+      index,
+      // Stay on screen while the next shot transitions in over this one.
+      tail: index < shots.length - 1 ? TRANSITION_FRAMES : 0,
+    }),
   );
 };
 

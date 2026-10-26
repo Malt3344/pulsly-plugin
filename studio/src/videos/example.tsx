@@ -60,6 +60,7 @@ export default function Example(props: VideoProps) {
             </Phone>
           </At>
           <At x={0} y={330}>
+            {/* Six failures flood in within the first second: the hook is chaos at frame 0. */}
             <Notifications
               width={940}
               items={[
@@ -68,22 +69,36 @@ export default function Example(props: VideoProps) {
                   app: 'Instagram',
                   text: 'Your reel is still processing',
                   time: '9:14',
-                  on: 'apps',
+                  on: 0.15,
                   color: '#dc2743',
                 },
                 {
                   app: 'YouTube',
                   text: 'Add a title to publish',
                   time: '9:31',
-                  on: 'killing',
+                  on: 0.3,
                   color: '#ff0033',
                 },
                 {
                   app: 'Facebook',
                   text: 'Video could not be posted',
                   time: '9:48',
-                  on: 'your',
+                  on: 0.45,
                   color: '#0866ff',
+                },
+                {
+                  app: 'TikTok',
+                  text: 'Draft expired',
+                  time: '10:05',
+                  on: 'killing',
+                  color: '#111111',
+                },
+                {
+                  app: 'Instagram',
+                  text: 'Cover image too small',
+                  time: '10:12',
+                  on: 'your',
+                  color: '#dc2743',
                 },
               ]}
             />
@@ -98,7 +113,7 @@ export default function Example(props: VideoProps) {
       <Shot
         from="You"
         tone="light"
-        entrance="zoom"
+        transition="zoom"
         headline={{ text: 'You upload every video four times.', highlight: ['four', 'times.'] }}
       >
         <Stage width={900} height={900}>
@@ -118,12 +133,12 @@ export default function Example(props: VideoProps) {
               </div>
             </Window>
           </At>
-          <Appear on="four" as="zoom" style={{ position: 'absolute', left: 560, top: 560 }}>
+          <Appear on="four" as="zoom" style={{ position: 'absolute', left: 600, top: 520 }}>
             <Big size={210} color="#ef4444">
               4×
             </Big>
           </Appear>
-          <Stamp on="times." delay={4} style={{ left: 90, top: 640 }}>
+          <Stamp on="times." delay={4} rotate={-8} style={{ left: 40, top: 690 }}>
             again
           </Stamp>
         </Stage>
@@ -132,7 +147,7 @@ export default function Example(props: VideoProps) {
       {/* The turn: one click in Pulsly publishes to every channel. */}
       <Shot
         from="Pulsly"
-        entrance="slide"
+        transition="push"
         headline={{ text: 'Pulsly fixes that.', highlight: ['fixes'] }}
       >
         <Stage width={940} height={980}>
@@ -175,10 +190,22 @@ export default function Example(props: VideoProps) {
       <Shot
         from="Upload"
         tone="light"
-        entrance="rise"
+        transition="wipe"
         headline={{ text: 'Upload once. It goes everywhere.', highlight: ['everywhere.'] }}
       >
         <Stage width={920} height={1000}>
+          {/* The drop zone fills the frame from the first frame of the shot. */}
+          <At x={110} y={0}>
+            <div
+              style={{
+                width: 700,
+                height: 340,
+                borderRadius: 32,
+                border: '5px dashed rgba(0,0,0,0.18)',
+                background: 'rgba(255,255,255,0.6)',
+              }}
+            />
+          </At>
           <At x={350} y={40}>
             <Appear on="Upload" as="left" sound="whoosh">
               <Float amount={8}>
@@ -236,7 +263,7 @@ export default function Example(props: VideoProps) {
       {/* The second job: Claude makes the videos. */}
       <Shot
         from="Or"
-        entrance="drop"
+        transition="whip"
         headline={{ text: 'Or let Claude make the videos for you.', highlight: ['Claude'] }}
       >
         <div style={{ display: 'grid', justifyItems: 'center', gap: 34 }}>
@@ -271,7 +298,7 @@ export default function Example(props: VideoProps) {
       <Shot
         from="One"
         tone="light"
-        entrance="zoom"
+        transition="zoom"
         headline={{ text: 'One founder: 2 posts a month → 30', highlight: ['30'] }}
       >
         <Card style={{ width: 880, display: 'grid', gap: 18 }}>
@@ -293,7 +320,7 @@ export default function Example(props: VideoProps) {
       </Shot>
 
       {/* The ask. */}
-      <Shot from="Comment" entrance="zoom">
+      <Shot from="Comment" transition="zoom">
         <Comment keyword="POST" reward="The full setup, in your DMs" on="Comment" />
       </Shot>
     </Video>

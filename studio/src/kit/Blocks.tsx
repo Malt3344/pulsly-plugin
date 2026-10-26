@@ -229,7 +229,7 @@ export function Sticker({
         ...style,
       }}
     >
-      {on !== undefined && <Sfx name="thud" at={startFrame} />}
+      {on !== undefined && <Sfx name="stamp" at={startFrame} />}
       <div
         style={{
           background: colors.accent,

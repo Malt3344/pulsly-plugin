@@ -4,31 +4,44 @@ import { Background } from './Background';
 import { Headline, type HeadlineSpec } from './Headline';
 import { Sfx } from './Sfx';
 import { fonts, ToneProvider, useBrand, useColors, type Tone } from './theme';
-import { ShotTimingProvider, type Cue } from './timing';
+import { ShotTimingProvider, useShotTiming, type Cue } from './timing';
 
 /** The video ends this long after the last word. */
 export const TAIL_SECONDS = 0.8;
+/** Frames a transition takes; the next shot starts covering this one this early. */
+export const TRANSITION_FRAMES = 9;
 
-const ENTER = 10;
-const EXIT = 6;
+/**
+ * How a shot cuts in over the previous one, full screen: `push` slides in sideways,
+ * `zoom` punches in from close, `wipe` opens as a circle, `whip` flies up with blur.
+ */
+export const TRANSITIONS = ['push', 'zoom', 'wipe', 'whip'] as const;
+export type Transition = (typeof TRANSITIONS)[number];
 
-/** Each shot enters differently from the last, so cuts feel edited, not repeated. */
-export const ENTRANCES = ['rise', 'zoom', 'slide', 'drop'] as const;
-export type Entrance = (typeof ENTRANCES)[number];
+const ease = (t: number) => 1 - (1 - t) ** 4;
 
-const enterTransform = (entrance: Entrance, t: number) => {
-  const ease = 1 - (1 - t) ** 3;
-  switch (entrance) {
+const transitionStyle = (transition: Transition, t: number) => {
+  const e = ease(t);
+  const blur = (1 - e) * 22;
+
+  switch (transition) {
     case 'zoom':
-      return `scale(${1.18 - ease * 0.18})`;
-    case 'slide':
-      return `translateX(${(1 - ease) * 260}px)`;
-    case 'drop':
-      return `translateY(${(1 - ease) * -200}px)`;
+      return {
+        transform: `scale(${1.35 - e * 0.35})`,
+        filter: `blur(${blur}px)`,
+        opacity: Math.min(1, t * 2.5),
+      };
+    case 'wipe':
+      return { clipPath: `circle(${e * 120}% at 50% 55%)` };
+    case 'whip':
+      return { transform: `translateY(${(1 - e) * 100}%)`, filter: `blur(${blur}px)` };
     default:
-      return `translateY(${(1 - ease) * 160}px)`;
+      return { transform: `translateX(${(1 - e) * 100}%)`, filter: `blur(${blur * 0.6}px)` };
   }
 };
+
+/** Content is drawn 10% larger than its pixel sizes, so visuals fill the frame like the best reels. */
+const CONTENT_SCALE = 1.1;
 
 export interface ShotProps {
   /**
@@ -37,44 +50,42 @@ export interface ShotProps {
    * A shot usually covers one or two sentences.
    */
   from: Cue;
-  /** Set by <Video>: the resolved start and end in seconds. */
-  start?: number;
-  end?: number;
   tone?: Tone;
   headline?: HeadlineSpec;
   /** Small chapter label at the top left, e.g. "01 · the proof". */
   chapter?: string;
-  entrance?: Entrance;
-  /** Plays a whoosh as the shot comes in (default true). */
-  whoosh?: boolean;
+  /** How this shot cuts in. Defaults rotate through all of them. */
+  transition?: Transition;
   children: ReactNode;
+  /** Set by <Video>. */
+  start?: number;
+  end?: number;
+  index?: number;
+  /** Frames the next shot overlaps this one while it transitions in. */
+  tail?: number;
 }
-
-/** Content is drawn 10% larger than its pixel sizes, so visuals fill the frame like the best reels. */
-const CONTENT_SCALE = 1.1;
 
 function ShotFrame({
   headline,
   chapter,
-  entrance = 'rise',
-  whoosh = true,
-  first,
+  transition,
   children,
-}: Omit<ShotProps, 'from' | 'start' | 'end' | 'tone'> & { first: boolean }) {
+}: Pick<ShotProps, 'headline' | 'chapter' | 'children'> & { transition: Transition }) {
   const frame = useCurrentFrame();
   const { durationInFrames } = useVideoConfig();
+  const { lead } = useShotTiming();
   const colors = useColors();
   const clamp = { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' } as const;
-  // The very first frame is the thumbnail and the hook: it must not fade in.
-  const enter = first ? 1 : interpolate(frame, [0, ENTER], [0, 1], clamp);
-  const exit = interpolate(frame, [durationInFrames - EXIT, durationInFrames], [1, 0], clamp);
-  // A slow push-in keeps the frame alive, like a camera on a slider.
-  const push = interpolate(frame, [0, durationInFrames], [1, 1.04]);
+  // The very first shot is the thumbnail and the hook: it is there from frame 0.
+  const t = lead === 0 ? 1 : interpolate(frame, [0, lead], [0, 1], clamp);
+  // Content settles just after the cut, and the camera keeps pushing in slowly.
+  const settle = lead === 0 ? 1 : ease(interpolate(frame, [lead * 0.5, lead * 1.6], [0, 1], clamp));
+  const push = interpolate(frame, [0, durationInFrames], [1, 1.045]);
 
   return (
-    <AbsoluteFill>
+    <AbsoluteFill style={transitionStyle(transition, t)}>
       <Background />
-      {whoosh && !first && <Sfx name="whoosh" at={0} />}
+      {lead > 0 && <Sfx name="whoosh" at={0} />}
       {chapter && (
         <div
           style={{
@@ -90,20 +101,18 @@ function ShotFrame({
           // {chapter}
         </div>
       )}
-      <AbsoluteFill style={{ opacity: Math.min(enter, exit) }}>
-        {headline && <Headline {...headline} />}
-        <AbsoluteFill
-          style={{
-            top: headline ? 330 : 200,
-            bottom: 360,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            transform: `${enterTransform(entrance, enter)} scale(${(push + (1 - exit) * 0.05) * CONTENT_SCALE})`,
-          }}
-        >
-          {children}
-        </AbsoluteFill>
+      {headline && <Headline {...headline} />}
+      <AbsoluteFill
+        style={{
+          top: headline ? 330 : 200,
+          bottom: 360,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          transform: `scale(${push * CONTENT_SCALE * (0.95 + settle * 0.05)})`,
+        }}
+      >
+        {children}
       </AbsoluteFill>
     </AbsoluteFill>
   );
@@ -111,21 +120,36 @@ function ShotFrame({
 
 /**
  * One shot of the video: a background, an optional headline and the visual. Words
- * inside the shot can trigger animations (see `useCue`).
+ * inside the shot trigger animations (see `useCue`). Each shot cuts in over the
+ * previous one with a full-screen transition.
  */
 // `from` is resolved into `start` and `end` by <Video>, which knows the order of the shots.
-export function Shot({ from: _from, start = 0, end = start + 3, tone, ...frameProps }: ShotProps) {
+export function Shot({
+  from: _from,
+  start = 0,
+  end = start + 3,
+  index = 0,
+  tail = 0,
+  tone,
+  transition,
+  ...frameProps
+}: ShotProps) {
   const { fps } = useVideoConfig();
   const brand = useBrand();
+  const lead = start < 0.05 ? 0 : TRANSITION_FRAMES;
+  const startFrame = Math.round(start * fps) - lead;
 
   return (
     <Sequence
-      from={Math.round(start * fps)}
-      durationInFrames={Math.max(1, Math.round((end - start) * fps))}
+      from={Math.max(0, startFrame)}
+      durationInFrames={Math.max(1, Math.round((end - start) * fps) + lead + tail)}
     >
-      <ShotTimingProvider timing={{ start, end }}>
+      <ShotTimingProvider timing={{ start, end, lead }}>
         <ToneProvider tone={tone ?? brand.tone}>
-          <ShotFrame {...frameProps} first={start < 0.1} />
+          <ShotFrame
+            {...frameProps}
+            transition={transition ?? TRANSITIONS[index % TRANSITIONS.length]!}
+          />
         </ToneProvider>
       </ShotTimingProvider>
     </Sequence>

@@ -6,7 +6,8 @@ larger than its pixel sizes, so a 940 px wide visual fills the frame.
 
 ## Timing: picture on its word
 
-Every component with `on` appears or acts when that word is spoken; `delay` adds frames
+Every component with `on` appears or acts when that word is spoken (cued on the shot's
+first word, it comes in with the transition); `delay` adds frames
 (30 = one second) after it. A cue is:
 
 - `"word"` — the first time the word is said in the current shot (case and punctuation are
@@ -85,9 +86,12 @@ and size them big (`size={120}`) to build objects and metaphors.
 
 ## Sound
 
-Shots whoosh in; `Appear` pops; stamps thud; cursors click; checks and counters tick; coins
-ding. Add more with `<Sfx name="pop|whoosh|click|tick|thud|ding" at={frame} />` (frame within
-the shot). Music plays under everything and dips while the voice speaks.
+Real CC0 recordings (Kenney, artisticdude; see `public/sfx/CREDITS.md`), several takes each
+so repeats sound natural. Shots whoosh in; `Appear` pops; stamps hit; strikes scribble;
+crosses buzz; cursors click; checks and counters tick; `Big` rises; coins and rewards ding.
+Add more with `<Sfx name="whoosh|pop|click|tick|stamp|ding|error|scribble|rise" at={frame} />`
+(frame within the shot). Music plays under everything and dips while the voice speaks; drop
+your own track at `public/music/bed.wav` to replace it.
 
 ## Patterns that work
 

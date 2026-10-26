@@ -49,7 +49,7 @@ export function Headline({ text, highlight = [] }: HeadlineSpec) {
         // Reveal each word as it is spoken; fall back to a quick stagger.
         const at = (spoken[index]?.start ?? shot.start + index * 0.12) - shot.start;
         const progress = spring({
-          frame: frame - at * fps,
+          frame: frame - shot.lead - at * fps,
           fps,
           config: { damping: 16, mass: 0.4 },
         });

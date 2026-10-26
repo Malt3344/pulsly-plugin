@@ -86,7 +86,7 @@ export function Strike({
 
   return (
     <span style={{ position: 'relative', display: 'inline-block', opacity: 1 - draw * 0.35 }}>
-      {on !== undefined && <Sfx name="tick" at={startFrame} />}
+      {on !== undefined && <Sfx name="scribble" at={startFrame} />}
       {children}
       <span
         style={{
@@ -148,7 +148,7 @@ export function Stamp({
         ...style,
       }}
     >
-      {on !== undefined && <Sfx name="thud" at={startFrame} />}
+      {on !== undefined && <Sfx name="stamp" at={startFrame} />}
       {children}
     </div>
   );
@@ -187,7 +187,7 @@ export function Cross({
         ...style,
       }}
     >
-      {on !== undefined && <Sfx name="pop" at={startFrame} />}✕
+      {on !== undefined && <Sfx name="error" at={startFrame} />}✕
     </div>
   );
 }

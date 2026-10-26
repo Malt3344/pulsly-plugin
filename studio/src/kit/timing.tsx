@@ -12,10 +12,12 @@ interface ShotTiming {
   /** Seconds into the video where the shot starts and ends. */
   start: number;
   end: number;
+  /** Frames the shot begins before `start`, while it transitions in over the previous one. */
+  lead: number;
 }
 
 const WordsContext = createContext<Word[]>([]);
-const ShotContext = createContext<ShotTiming>({ start: 0, end: Infinity });
+const ShotContext = createContext<ShotTiming>({ start: 0, end: Infinity, lead: 0 });
 
 export function WordsProvider({ words, children }: { words: Word[]; children: ReactNode }) {
   return <WordsContext.Provider value={words}>{children}</WordsContext.Provider>;
@@ -94,7 +96,12 @@ export const useCue = (cue: Cue | undefined, { delay = 0, damping = 14, mass = 0
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const shot = useShotTiming();
-  const startFrame = Math.round((useCueTime(cue) - shot.start) * fps) + delay;
+  const cueTime = useCueTime(cue);
+  // Anything cued on the shot's first word comes in with the transition, so a shot never
+  // cuts in empty.
+  const startFrame =
+    (cueTime <= shot.start + 0.02 ? 0 : Math.round((cueTime - shot.start) * fps) + shot.lead) +
+    delay;
   const since = frame - startFrame;
 
   return {

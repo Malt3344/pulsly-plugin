@@ -1,5 +1,5 @@
-// Synthesises the sound effects and the music bed into public/sfx and public/music.
-// Everything is generated here, so there is nothing to license. Runs after npm install.
+// Synthesises the background music into public/music, so there is nothing to license.
+// Runs after npm install. (Sound effects are real CC0 recordings in public/sfx.)
 import { mkdir, writeFile } from 'node:fs/promises';
 
 const RATE = 44100;
@@ -62,63 +62,6 @@ const lowpass = (samples, cutoff) => {
 const highpass = (samples, hz) => {
   const low = lowpass(samples, hz);
   return samples.map((x, i) => x - low[i]);
-};
-
-const effects = {
-  // Air rushing past: band-limited noise sweeping up and back down.
-  whoosh: () => {
-    const raw = make(0.55, () => noise());
-    const swept = lowpass(
-      highpass(raw, 250),
-      (t) => 400 + 3200 * Math.sin(Math.PI * Math.min(1, t / 0.5)),
-    );
-    return swept.map((s, i) => {
-      const t = i / RATE;
-      return s * Math.sin(Math.PI * Math.min(1, t / 0.55)) ** 1.5;
-    });
-  },
-  // A bubbly pop for things appearing.
-  pop: () =>
-    make(0.16, (t) => {
-      const freq = 300 + 700 * Math.exp(-t * 40);
-      return Math.sin(2 * Math.PI * freq * t) * Math.exp(-t * 28);
-    }),
-  // A crisp mouse click.
-  click: () => {
-    const burst = highpass(
-      make(0.04, () => noise()),
-      2000,
-    );
-    return burst.map((s, i) => {
-      const t = i / RATE;
-      return (s * 0.7 + Math.sin(2 * Math.PI * 3200 * t) * 0.3) * Math.exp(-t * 160);
-    });
-  },
-  // A short tick for counters and checks.
-  tick: () => make(0.05, (t) => Math.sin(2 * Math.PI * 2400 * t) * Math.exp(-t * 90)),
-  // A stamp hitting paper: low thump plus a papery slap.
-  thud: () => {
-    const slap = lowpass(
-      make(0.3, () => noise()),
-      1800,
-    );
-    return slap.map((s, i) => {
-      const t = i / RATE;
-      const body = Math.sin(2 * Math.PI * (55 + 60 * Math.exp(-t * 30)) * t) * Math.exp(-t * 12);
-      return body * 0.9 + s * Math.exp(-t * 35) * 0.6;
-    });
-  },
-  // A bright ding for wins and money.
-  ding: () =>
-    make(1.1, (t) =>
-      [1, 2.01, 3.02, 4.17].reduce(
-        (sum, partial, index) =>
-          sum +
-          (Math.sin(2 * Math.PI * 1318 * partial * t) * Math.exp(-t * (3 + index * 2))) /
-            (index + 1),
-        0,
-      ),
-    ),
 };
 
 const BPM = 92;
@@ -195,12 +138,6 @@ const music = () => {
   return [lowpass(Array.from(left), 5000), lowpass(Array.from(right), 5000)];
 };
 
-await mkdir('public/sfx', { recursive: true });
 await mkdir('public/music', { recursive: true });
-await Promise.all(
-  Object.entries(effects).map(([name, fn]) =>
-    writeFile(`public/sfx/${name}.wav`, wav(normalize([fn()], 0.8))),
-  ),
-);
 await writeFile('public/music/bed.wav', wav(normalize(music(), 0.6)));
-console.log('Generated sound effects and music');
+console.log('Generated the music bed');

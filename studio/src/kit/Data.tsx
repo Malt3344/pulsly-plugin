@@ -109,7 +109,7 @@ export function Big({
         ...style,
       }}
     >
-      {on !== undefined && <Sfx name="pop" at={startFrame} />}
+      {on !== undefined && <Sfx name="rise" at={startFrame} />}
       {children}
     </div>
   );
