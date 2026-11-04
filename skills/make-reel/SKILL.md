@@ -24,14 +24,21 @@ Keep the user in the loop at two checkpoints: the script, and the finished video
 
 ## 1. Set up the studio and brand kit
 
-The studio lives in `./pulsly-studio` in the current folder. If it does not exist:
+**Where the studio is.** In a downloaded Pulsly folder, the studio is the `studio` folder in
+the current folder: use it in place. Otherwise (the Pulsly plugin) it lives in `./pulsly-studio`;
+if that does not exist, create it:
 
 ```bash
 rsync -a --exclude node_modules "${CLAUDE_PLUGIN_ROOT}/studio/" ./pulsly-studio/
-cd pulsly-studio && npm install && cp .env.example .env
 ```
 
-If it exists but its `package.json` version is lower than
+Below, `<studio>` means whichever of the two folders it is.
+
+If `<studio>/node_modules` does not exist, run `cd <studio> && npm install` (Node.js 22 or later
+is needed: if `node -v` fails, ask the user to install the LTS version from https://nodejs.org
+and restart Claude). If `<studio>/.env` does not exist, copy `.env.example` to it.
+
+In the plugin, if `./pulsly-studio/package.json` has a lower version than
 `${CLAUDE_PLUGIN_ROOT}/studio/package.json`, update the code and keep the user's files:
 
 ```bash
@@ -40,22 +47,22 @@ rsync -a --exclude node_modules --exclude public/videos --exclude public/brand \
   "${CLAUDE_PLUGIN_ROOT}/studio/" ./pulsly-studio/ && (cd pulsly-studio && npm install)
 ```
 
-**Brand kit.** If `pulsly-studio/brand.json` does not exist, ask once for the brand name, the
+**Brand kit.** If `<studio>/brand.json` does not exist, ask once for the brand name, the
 social handle (e.g. `@pulsly`), a brand colour and whether they prefer a `dark` or `light`
 look, and write it (see `brand.example.json`). Ask for real product screenshots in
-`pulsly-studio/public/brand/`: real screens make the best proof.
+`<studio>/public/brand/`: real screens make the best proof.
 
 The voice is Kokoro, free and local. The default is `am_michael`; other voices can be set in
-`pulsly-studio/.env` (e.g. `am_adam`, `af_heart`, `bm_george`). Music and sound effects are
-generated on install; there is nothing to license.
+`<studio>/.env` (e.g. `am_adam`, `af_heart`, `bm_george`). Music is generated on install and
+the sound effects are CC0 recordings; there is nothing to license.
 
-If the Pulsly tools (`list_channels` and the others) are not available, ask the user to run
+If the Pulsly tools (`list_channels` and the others) are not available, ask the user to type
 `/mcp`, choose **pulsly** → **Authenticate**, log in and click **Allow**.
 
 ## 2. Write the script — checkpoint
 
 Pick a short slug (e.g. `sell-the-job`). Write the voiceover to
-`pulsly-studio/public/videos/<slug>/script.txt` and show it to the user.
+`<studio>/public/videos/<slug>/script.txt` and show it to the user.
 
 - **Length:** 35–60 seconds for an explainer (110–170 words); 20–30 seconds for a quick tip.
 - **Hook in the first second:** the first frame is the thumbnail and the first five words
@@ -76,7 +83,7 @@ Pick a short slug (e.g. `sell-the-job`). Write the voiceover to
 ## 3. Record the voice
 
 ```bash
-cd pulsly-studio && npm run voice -- <slug>
+cd <studio> && npm run voice -- <slug>
 ```
 
 Writes `voice.wav` and `words.json` (every word with `start`/`end` seconds). Pauses between
@@ -100,9 +107,9 @@ Read `words.json` and the script, then write a beat sheet (in your head or a scr
 
 ## 5. Write the video in code
 
-Read `${CLAUDE_PLUGIN_ROOT}/skills/make-reel/kit.md` (the components) and
-`pulsly-studio/src/videos/example.tsx` (a finished video) first. Then write
-`pulsly-studio/src/videos/<slug>.tsx`:
+Read `kit.md` next to this skill (the components) and
+`<studio>/src/videos/example.tsx` (a finished video) first. Then write
+`<studio>/src/videos/<slug>.tsx`:
 
 ```tsx
 import { Appear, Shot, Stamp, Video, Window, type VideoProps } from '../kit';
@@ -147,7 +154,7 @@ Then run `npm run check` and fix any type errors.
 ## 6. Check your work
 
 ```bash
-cd pulsly-studio && npm run preview -- <slug>
+cd <studio> && npm run preview -- <slug>
 ```
 
 Renders `public/videos/<slug>/preview-1.jpg`, `-2.jpg`…: a still every second. **Open every
@@ -161,7 +168,7 @@ page and look at every tile.** Fix the video and preview again until:
 ## 7. Render — checkpoint
 
 ```bash
-cd pulsly-studio && npm run render -- <slug>
+cd <studio> && npm run render -- <slug>
 ```
 
 Renders `public/videos/<slug>/reel.mp4` with music and sound effects, levels the sound to
@@ -207,14 +214,40 @@ product"):
 
 ## Autopilot
 
-A request that starts with `autopilot:` comes from a scheduled run with nobody watching
-(set up on the Videos page in Pulsly). Then:
+### Turning autopilot on and off
+
+When the user asks to turn on autopilot (e.g. "Turn on autopilot: every Sunday make 5 videos
+about … , one per day at 9:00, post to …"), set up a weekly task on their computer yourself,
+two hours before the first post, that runs in the current folder:
+
+```
+claude -p "autopilot: <what to make, how many, when, style, channel ids>" --allowedTools Bash Read Write Edit <pulsly tools>
+```
+
+`<pulsly tools>` is `mcp__pulsly` in a downloaded Pulsly folder and `mcp__plugin_pulsly_pulsly`
+in the plugin. Append the output to `autopilot.log` in the folder.
+
+- **macOS:** a LaunchAgent at `~/Library/LaunchAgents/co.pulsly.autopilot.plist` running
+  `/bin/zsh -lc "cd '<folder>' && …"` with a `StartCalendarInterval`, then `launchctl load` it
+  (launchd catches up on runs missed while the Mac slept).
+- **Windows:** a weekly Task Scheduler task named "Pulsly autopilot" (`schtasks /Create … /SC
+WEEKLY`) that runs the command in the folder.
+- **Linux:** a crontab line tagged `# pulsly-autopilot`.
+
+Tell the user in one sentence what will happen and that the computer must be on. To turn it
+off, remove that task. Autopilot runs Claude without asking for permission in this folder;
+mention it, and that every video still waits for their approval in Pulsly.
+
+### Autopilot runs
+
+A request that starts with `autopilot:` comes from a scheduled run with nobody watching.
+Then:
 
 - Never ask questions or wait for approval; the checkpoints in steps 2 and 7 are skipped, but
   always do the checks in steps 6 and 7.
 - Use the channels, style, number of videos and posting time from the request. Pick a fresh
   angle for each video: check `list_posts` and avoid repeating recent hooks.
-- Set up the studio if `./pulsly-studio` does not exist yet.
+- Set up the studio (step 1) if it is not installed yet.
 - Send every video with `schedule_post` at the suggested times. They wait in Pulsly for the
   user's approval; that is expected.
 - End with a short summary (day, hook, channels) so the log shows what was made. If something
