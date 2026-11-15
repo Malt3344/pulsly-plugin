@@ -14,9 +14,13 @@ const { dir, path } = await prepare(process.argv[2]);
 const raw = join(dir, 'reel-raw.mp4');
 const output = join(dir, 'reel.mp4');
 
-execFileSync('npx', ['remotion', 'render', 'src/index.ts', 'Reel', raw, `--props=${path}`, '--gl=angle'], {
-  stdio: 'inherit',
-});
+execFileSync(
+  'npx',
+  ['remotion', 'render', 'src/index.ts', 'Reel', raw, `--props=${path}`, '--gl=angle'],
+  {
+    stdio: 'inherit',
+  },
+);
 
 execFileSync(
   'npx',

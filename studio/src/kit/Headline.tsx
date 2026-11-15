@@ -96,8 +96,7 @@ export function Headline({ text, highlight = [] }: HeadlineSpec) {
               display: 'inline-block',
               opacity: progress,
               transform: `translateY(${(1 - progress) * 18}px)`,
-              ...(layout === 'captions' &&
-                boxed.has(normalize(token)) && { color: colors.accent }),
+              ...(layout === 'captions' && boxed.has(normalize(token)) && { color: colors.accent }),
               ...(isBoxed && highlightStyle(layout, colors.accent, progress)),
             }}
           >

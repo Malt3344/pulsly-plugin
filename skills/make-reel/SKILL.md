@@ -65,8 +65,8 @@ does not say which, ask. Write the video's brand kit to
   Best for advice, stories and opinions. Leave the bottom right free for the presenter.
 - `motion` — **Motion graphics.** Bold product screens, numbers and stamps on dark and light
   shots. Best for product walkthroughs and results. Write the script from `about`; if it is empty, ask
-what the business sells and suggest filling in the brand kit in Pulsly. Real product
-screenshots in `<studio>/public/brand/` make the best proof: ask for them.
+  what the business sells and suggest filling in the brand kit in Pulsly. Real product
+  screenshots in `<studio>/public/brand/` make the best proof: ask for them.
 
 The voice is Kokoro, free and local. The default is `am_michael`; other voices can be set in
 `<studio>/.env` (e.g. `am_adam`, `af_heart`, `bm_george`). Music is generated on install and

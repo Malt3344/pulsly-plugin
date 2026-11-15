@@ -1,12 +1,5 @@
 import { Composition } from 'remotion';
-import {
-  COLUMNS,
-  Contact,
-  contactHeight,
-  GAP,
-  TILE_WIDTH,
-  type ContactProps,
-} from './Contact';
+import { COLUMNS, Contact, contactHeight, GAP, TILE_WIDTH, type ContactProps } from './Contact';
 import CurrentVideo from './current';
 import { TAIL_SECONDS } from './kit/Shot';
 import { FPS, HEIGHT, WIDTH } from './kit/theme';

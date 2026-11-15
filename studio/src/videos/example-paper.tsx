@@ -61,7 +61,11 @@ export default function ExamplePaper(props: VideoProps) {
             <Row title="Features" subtitle="12 things it does" />
           </Strike>
           <Row title="Pricing" subtitle="$29 / month" />
-          <Row title="Explainer videos" subtitle="none yet" trailing={<Pill variant="red">0</Pill>} />
+          <Row
+            title="Explainer videos"
+            subtitle="none yet"
+            trailing={<Pill variant="red">0</Pill>}
+          />
           <Appear on="nobody" as="pop">
             <Pill variant="red" size={40}>
               Nobody gets it
@@ -93,7 +97,11 @@ export default function ExamplePaper(props: VideoProps) {
         headline={{ text: '30 videos, and your first customers.', highlight: ['customers'] }}
       >
         <Phone width={460}>
-          <Bars values={[2, 5, 9, 16, 28, 47]} labels={['W1', 'W2', 'W3', 'W4', 'W5', 'W6']} on="Thirty" />
+          <Bars
+            values={[2, 5, 9, 16, 28, 47]}
+            labels={['W1', 'W2', 'W3', 'W4', 'W5', 'W6']}
+            on="Thirty"
+          />
           <Notifications
             items={[
               { app: 'Stripe', text: 'New customer · $29', on: 'first', color: '#635bff' },

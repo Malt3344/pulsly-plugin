@@ -1,13 +1,28 @@
 // Example in the explainer3d style: every shot is a 3D scene under a spotlight, with
 // captions at the bottom. Set "style": "explainer3d" in the video's brand.json.
-import { Block, Burst, Coin, Orb, Pedestal, Pillar, Screen, Shot, Stage3D, Video, type VideoProps } from '../kit';
+import {
+  Block,
+  Burst,
+  Coin,
+  Orb,
+  Pedestal,
+  Pillar,
+  Screen,
+  Shot,
+  Stage3D,
+  Video,
+  type VideoProps,
+} from '../kit';
 
 export default function Example3D(props: VideoProps) {
   return (
     <Video props={props}>
       <Shot
         from={0}
-        headline={{ text: 'This video was made by an AI, and nobody touched it.', highlight: ['AI,'] }}
+        headline={{
+          text: 'This video was made by an AI, and nobody touched it.',
+          highlight: ['AI,'],
+        }}
         scene={
           <Stage3D camera={{ from: [0, 2, 12], to: [0, 1.2, 8.5] }}>
             <Pedestal />
@@ -34,7 +49,9 @@ export default function Example3D(props: VideoProps) {
 
       <Shot
         from="Claude"
-        headline={{ text: 'Claude wrote the script, built every scene in 3D, and recorded the voice.' }}
+        headline={{
+          text: 'Claude wrote the script, built every scene in 3D, and recorded the voice.',
+        }}
         scene={
           <Stage3D camera={{ from: [0, 3.5, 13], to: [0, 2.5, 11] }}>
             <Block position={[-1.8, 0, 0]} label="✎" on="script" />

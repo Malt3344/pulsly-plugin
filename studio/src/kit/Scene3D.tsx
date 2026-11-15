@@ -4,7 +4,14 @@ import { useMemo, type ReactNode } from 'react';
 import { AbsoluteFill, interpolate, random, useCurrentFrame, useVideoConfig } from 'remotion';
 import * as THREE from 'three';
 import { BrandProvider, fonts, ToneProvider, useBrand, useColors } from './theme';
-import { ShotTimingProvider, useCue, useShotTiming, useWords, WordsProvider, type Cue } from './timing';
+import {
+  ShotTimingProvider,
+  useCue,
+  useShotTiming,
+  useWords,
+  WordsProvider,
+  type Cue,
+} from './timing';
 
 type Vec3 = [number, number, number];
 
@@ -137,7 +144,12 @@ interface ObjectProps {
 }
 
 /** A round stage block to put things on. */
-export function Pedestal({ position = [0, -1.05, 0], on, delay = 0, color = '#1a2238' }: ObjectProps) {
+export function Pedestal({
+  position = [0, -1.05, 0],
+  on,
+  delay = 0,
+  color = '#1a2238',
+}: ObjectProps) {
   const { scale } = useEntrance(on, delay, false);
 
   return (
@@ -149,7 +161,10 @@ export function Pedestal({ position = [0, -1.05, 0], on, delay = 0, color = '#1a
 }
 
 /** Draws text on a canvas, to use as a texture on 3D surfaces. */
-const useTextTexture = (lines: string[], { color = '#ffffff', background = 'transparent', size = 120 } = {}) =>
+const useTextTexture = (
+  lines: string[],
+  { color = '#ffffff', background = 'transparent', size = 120 } = {},
+) =>
   useMemo(() => {
     const canvas = document.createElement('canvas');
     canvas.width = 1024;
@@ -186,7 +201,11 @@ export function Block({
   const texture = useTextTexture(label ? [label] : [''], { size: 420 });
 
   return (
-    <group position={[position[0], position[1] + lift, position[2]]} scale={scale} rotation={[0, spin, 0]}>
+    <group
+      position={[position[0], position[1] + lift, position[2]]}
+      scale={scale}
+      rotation={[0, spin, 0]}
+    >
       <mesh>
         <boxGeometry args={[size, size, size]} />
         <meshStandardMaterial color={color ?? '#2b3a63'} roughness={0.35} metalness={0.3} />
@@ -206,7 +225,13 @@ export function Block({
 }
 
 /** A glowing glass orb in the accent colour: an idea, an AI, a core. */
-export function Orb({ position = [0, 0.4, 0], on, delay = 0, color, size = 0.9 }: ObjectProps & { size?: number }) {
+export function Orb({
+  position = [0, 0.4, 0],
+  on,
+  delay = 0,
+  color,
+  size = 0.9,
+}: ObjectProps & { size?: number }) {
   const { accent } = useColors();
   const { scale, lift } = useEntrance(on, delay, true);
   const tint = color ?? accent;
@@ -276,7 +301,11 @@ export function Screen({
   const texture = useTextTexture(lines, { background: '#0b1122', size: 200 });
 
   return (
-    <group position={[position[0], position[1] + lift, position[2]]} rotation={[0, tilt, 0]} scale={scale}>
+    <group
+      position={[position[0], position[1] + lift, position[2]]}
+      rotation={[0, tilt, 0]}
+      scale={scale}
+    >
       <mesh>
         <boxGeometry args={[2.6, 2.6, 0.12]} />
         <meshStandardMaterial color="#141c33" roughness={0.3} metalness={0.6} />
@@ -317,7 +346,11 @@ export function Burst({ on, count = 40, color }: { on?: Cue; count?: number; col
   const pieces = useMemo(
     () =>
       Array.from({ length: count }, (_, index) => ({
-        direction: [random(`bx${index}`) - 0.5, random(`by${index}`) * 0.8, random(`bz${index}`) - 0.5] as Vec3,
+        direction: [
+          random(`bx${index}`) - 0.5,
+          random(`by${index}`) * 0.8,
+          random(`bz${index}`) - 0.5,
+        ] as Vec3,
         size: 0.08 + random(`bs${index}`) * 0.14,
       })),
     [count],
@@ -335,7 +368,11 @@ export function Burst({ on, count = 40, color }: { on?: Cue; count?: number; col
           rotation={[progress * 4 + index, progress * 3, 0]}
         >
           <boxGeometry args={[piece.size, piece.size, piece.size]} />
-          <meshStandardMaterial color={color ?? accent} emissive={color ?? accent} emissiveIntensity={0.4} />
+          <meshStandardMaterial
+            color={color ?? accent}
+            emissive={color ?? accent}
+            emissiveIntensity={0.4}
+          />
         </mesh>
       ))}
     </group>

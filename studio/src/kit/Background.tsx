@@ -32,7 +32,9 @@ export function SpaceBackground({ accent }: { accent: string }) {
   const frame = useCurrentFrame();
 
   return (
-    <AbsoluteFill style={{ background: 'radial-gradient(ellipse 120% 80% at 50% 30%, #0b1224, #04060d 70%)' }}>
+    <AbsoluteFill
+      style={{ background: 'radial-gradient(ellipse 120% 80% at 50% 30%, #0b1224, #04060d 70%)' }}
+    >
       {STARS.map((star, index) => (
         <div
           // Stars are a fixed, generated list.

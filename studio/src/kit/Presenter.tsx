@@ -96,14 +96,13 @@ export function Presenter() {
   const now = frame / fps;
 
   const speaking = words.find((word) => now >= word.start && now < word.end);
-  const mouth = speaking
-    ? 0.3 + 0.7 * Math.abs(Math.sin((now - speaking.start) * MOUTH_SPEED))
-    : 0;
+  const mouth = speaking ? 0.3 + 0.7 * Math.abs(Math.sin((now - speaking.start) * MOUTH_SPEED)) : 0;
 
   const starts = sentenceStarts(words);
   const sentence = Math.max(0, starts.filter((start) => start <= now).length - 1);
   const since = now - (starts[sentence] ?? 0);
-  const blend = sentence === 0 ? 1 : interpolate(since, [0, 0.3], [0, 1], { extrapolateRight: 'clamp' });
+  const blend =
+    sentence === 0 ? 1 : interpolate(since, [0, 0.3], [0, 1], { extrapolateRight: 'clamp' });
   const from = POSES[Math.max(0, sentence - 1) % POSES.length]!;
   const to = POSES[sentence % POSES.length]!;
   const pose = (side: 'left' | 'right') =>
@@ -162,7 +161,13 @@ export function Presenter() {
       {/* Cheeks and nose */}
       <ellipse cx={142} cy={266} rx={16} ry={9} fill="#e8957a" opacity={0.35} />
       <ellipse cx={258} cy={266} rx={16} ry={9} fill="#e8957a" opacity={0.35} />
-      <path d="M 198 236 Q 190 262 202 266" stroke="rgba(0,0,0,0.18)" strokeWidth={5} fill="none" strokeLinecap="round" />
+      <path
+        d="M 198 236 Q 190 262 202 266"
+        stroke="rgba(0,0,0,0.18)"
+        strokeWidth={5}
+        fill="none"
+        strokeLinecap="round"
+      />
 
       {/* Mouth: a smile when quiet, open while speaking */}
       {mouth > 0 ? (
@@ -171,7 +176,13 @@ export function Presenter() {
           <ellipse cy={mouth * 9} rx={14} ry={3 + mouth * 6} fill="#d9686a" />
         </g>
       ) : (
-        <path d="M 176 290 Q 200 308 224 290" stroke="#5a2320" strokeWidth={7} fill="none" strokeLinecap="round" />
+        <path
+          d="M 176 290 Q 200 308 224 290"
+          stroke="#5a2320"
+          strokeWidth={7}
+          fill="none"
+          strokeLinecap="round"
+        />
       )}
     </svg>
   );

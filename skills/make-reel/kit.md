@@ -23,14 +23,14 @@ For custom drawings: `const { since, progress, startFrame } = useCue('word', { d
 
 ## Structure
 
-| Component | Props                                                                                                                                    | Notes                                                 |
-| --------- | ---------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------- |
-| `Video`   | `props`                                                                                                                                  | Root. Adds voice, ducked music, progress bar, handle. |
+| Component | Props                                                                                                                                                    | Notes                                                                                 |
+| --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| `Video`   | `props`                                                                                                                                                  | Root. Adds voice, ducked music, progress bar, handle.                                 |
 | `Shot`    | `from`, `tone?` (`dark`/`light`/`paper`/`space`), `headline?` `{ text, highlight[] }`, `chapter?`, `transition?` (`push`/`zoom`/`wipe`/`whip`), `scene?` | One shot; cuts in with a whoosh. `scene` is a full-frame backdrop (e.g. `<Stage3D>`). |
-| `Stage`   | `width`, `height`                                                                                                                        | Fixed-size canvas for composing an illustration.      |
-| `At`      | `x`, `y`                                                                                                                                 | Absolute position inside a `Stage`.                   |
-| `Appear`  | `on`, `delay?`, `as?` (`pop`/`rise`/`drop`/`left`/`right`/`zoom`/`fade`), `sound?`, `until?`                                             | Brings anything in on a word; `until` makes it leave. |
-| `Float`   | `amount?`, `speed?`                                                                                                                      | Gentle bobbing so objects feel alive.                 |
+| `Stage`   | `width`, `height`                                                                                                                                        | Fixed-size canvas for composing an illustration.                                      |
+| `At`      | `x`, `y`                                                                                                                                                 | Absolute position inside a `Stage`.                                                   |
+| `Appear`  | `on`, `delay?`, `as?` (`pop`/`rise`/`drop`/`left`/`right`/`zoom`/`fade`), `sound?`, `until?`                                                             | Brings anything in on a word; `until` makes it leave.                                 |
+| `Float`   | `amount?`, `speed?`                                                                                                                                      | Gentle bobbing so objects feel alive.                                                 |
 
 ## Styles
 
@@ -49,16 +49,16 @@ and sets the default tone of every shot: `space` for 3D, `paper` for paper, `dar
   defaults to `[0, 1.6, 12]` → `[0, 1.2, 10]`), `on`, `delay` and `color`; without `on` they
   are there from the start, with `on` they drop in with a bounce.
 
-| 3D component | Props                                     | Use it for                                   |
-| ------------ | ----------------------------------------- | -------------------------------------------- |
-| `Stage3D`    | `camera?` `{ from, to, target? }`, `beam?` | The stage: floor, spotlight, gliding camera. |
-| `Pedestal`   | `position?`, `on?`, `color?`               | Something to stand things on.               |
-| `Block`      | `label?` (a number, word or symbol), `size?` | Steps, counts, building blocks.            |
-| `Orb`        | `size?`, `color?`                          | An idea, AI, a core; glows in the accent.    |
-| `Screen`     | `lines` (`['$15,000', 'savings']`), `tilt?` | A big number or word on a floating screen. |
-| `Pillar`     | —                                         | A bank, the stock market, an institution.    |
-| `Coin`       | —                                         | Money, a price, a saving (spins).            |
-| `Burst`      | `on`, `count?`, `color?`                   | An explosion of cubes: lots, chaos, data.    |
+| 3D component | Props                                        | Use it for                                   |
+| ------------ | -------------------------------------------- | -------------------------------------------- |
+| `Stage3D`    | `camera?` `{ from, to, target? }`, `beam?`   | The stage: floor, spotlight, gliding camera. |
+| `Pedestal`   | `position?`, `on?`, `color?`                 | Something to stand things on.                |
+| `Block`      | `label?` (a number, word or symbol), `size?` | Steps, counts, building blocks.              |
+| `Orb`        | `size?`, `color?`                            | An idea, AI, a core; glows in the accent.    |
+| `Screen`     | `lines` (`['$15,000', 'savings']`), `tilt?`  | A big number or word on a floating screen.   |
+| `Pillar`     | —                                            | A bank, the stock market, an institution.    |
+| `Coin`       | —                                            | Money, a price, a saving (spins).            |
+| `Burst`      | `on`, `count?`, `color?`                     | An explosion of cubes: lots, chaos, data.    |
 
 Make the 3D shots differ: move the camera in from a different side each time, combine
 objects (three `Block`s rising as steps, a `Screen` with the number on a `Pedestal`), and
