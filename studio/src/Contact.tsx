@@ -1,7 +1,5 @@
-import type { ComponentType } from 'react';
-import { AbsoluteFill, Freeze } from 'remotion';
-import { fonts, FPS, HEIGHT, WIDTH } from './kit/theme';
-import type { VideoProps } from './kit/Video';
+import { AbsoluteFill, Img } from 'remotion';
+import { fonts, HEIGHT, WIDTH } from './kit/theme';
 
 export const COLUMNS = 6;
 export const PER_PAGE = 18;
@@ -11,74 +9,51 @@ export const TILE_HEIGHT = HEIGHT * SCALE;
 export const LABEL = 34;
 export const GAP = 12;
 
-export interface ContactProps extends VideoProps {
-  /** Seconds between stills. */
-  interval: number;
-  page: number;
-  durationInSeconds: number;
+export interface ContactProps {
+  /** Stills of the video (data URLs) with their time, made by scripts/preview.mjs. */
+  tiles: { src: string; seconds: number }[];
+  [key: string]: unknown;
 }
 
-/**
- * Stills every `interval` seconds in a grid, so Claude can check the motion of
- * the whole video: if two neighbouring tiles look the same, nothing happened.
- */
-export function makeContact(VideoComponent: ComponentType<VideoProps>) {
-  return function Contact(props: ContactProps) {
-    const { interval, page, durationInSeconds } = props;
-    const times = Array.from(
-      { length: Math.floor(durationInSeconds / interval) + 1 },
-      (_, index) => index * interval,
-    ).slice((page - 1) * PER_PAGE, page * PER_PAGE);
+export const contactHeight = (tiles: number) =>
+  GAP + Math.ceil(Math.max(1, tiles) / COLUMNS) * (TILE_HEIGHT + LABEL + GAP);
 
-    return (
-      <AbsoluteFill
-        style={{
-          background: '#1a1a1a',
-          padding: GAP,
-          flexDirection: 'row',
-          flexWrap: 'wrap',
-          alignContent: 'flex-start',
-          gap: GAP,
-          fontFamily: fonts.sans,
-        }}
-      >
-        {times.map((seconds) => (
-          <div key={seconds} style={{ width: TILE_WIDTH }}>
-            <div
-              style={{
-                width: TILE_WIDTH,
-                height: TILE_HEIGHT,
-                overflow: 'hidden',
-                borderRadius: 8,
-              }}
-            >
-              <div
-                style={{
-                  width: WIDTH,
-                  height: HEIGHT,
-                  transform: `scale(${SCALE})`,
-                  transformOrigin: 'top left',
-                }}
-              >
-                <Freeze frame={Math.round(seconds * FPS)}>
-                  <VideoComponent {...props} audio={undefined} music={false} />
-                </Freeze>
-              </div>
-            </div>
-            <p
-              style={{
-                margin: 0,
-                height: LABEL,
-                lineHeight: `${LABEL}px`,
-                color: '#d0d0d0',
-                fontSize: 20,
-              }}
-            >
-              {seconds.toFixed(1)}s
-            </p>
-          </div>
-        ))}
-      </AbsoluteFill>
-    );
-  };
+/**
+ * Stills of the video in a grid, so Claude can check the motion of the whole video:
+ * if two neighbouring tiles look the same, nothing happened.
+ */
+export function Contact({ tiles }: ContactProps) {
+  return (
+    <AbsoluteFill
+      style={{
+        background: '#1a1a1a',
+        padding: GAP,
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        alignContent: 'flex-start',
+        gap: GAP,
+        fontFamily: fonts.sans,
+      }}
+    >
+      {tiles.map(({ src, seconds }) => (
+        <div key={seconds} style={{ width: TILE_WIDTH }}>
+          <Img
+            src={src}
+            style={{ width: TILE_WIDTH, height: TILE_HEIGHT, borderRadius: 8, display: 'block' }}
+          />
+          <p
+            style={{
+              margin: 0,
+              height: LABEL,
+              lineHeight: `${LABEL}px`,
+              color: '#d0d0d0',
+              fontSize: 20,
+            }}
+          >
+            {seconds.toFixed(1)}s
+          </p>
+        </div>
+      ))}
+    </AbsoluteFill>
+  );
 }

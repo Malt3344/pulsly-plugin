@@ -8,6 +8,7 @@ import {
   useVideoConfig,
 } from 'remotion';
 import { BrandProvider, fonts, palettes, type Brand } from './theme';
+import { Presenter } from './Presenter';
 import { Shot, TAIL_SECONDS, TRANSITION_FRAMES, type ShotProps } from './Shot';
 import { findCueTime, WordsProvider, type Word } from './timing';
 
@@ -126,6 +127,7 @@ export function Video({ props, children }: { props: VideoProps; children: ReactN
       <WordsProvider words={words}>
         <AbsoluteFill style={{ backgroundColor: palettes[brand.tone].background }}>
           {timeShots(children, words)}
+          {brand.style === 'paper' && brand.presenter !== false && <Presenter />}
           {audio && <Audio src={staticFile(audio)} />}
           {music && (
             <Audio

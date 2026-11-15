@@ -5,6 +5,9 @@ import { existsSync } from 'node:fs';
 import { readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 
+/** The default shot tone of each style (see src/kit/theme.tsx). */
+const STYLE_TONE = { motion: 'dark', paper: 'paper', explainer3d: 'space' };
+
 const readJson = async (path) => JSON.parse(await readFile(path, 'utf8'));
 
 export const prepare = async (slug) => {
@@ -25,8 +28,10 @@ export const prepare = async (slug) => {
     slug,
     brand: {
       accent: brandKit.accent ?? '#3fe0b0',
-      tone: brandKit.tone ?? brandKit.style ?? 'dark',
+      style: STYLE_TONE[brandKit.style] ? brandKit.style : 'motion',
+      tone: brandKit.tone ?? STYLE_TONE[brandKit.style] ?? 'dark',
       handle: brandKit.handle,
+      presenter: brandKit.presenter,
     },
     music: brandKit.music ?? true,
     audio: existsSync(join(dir, 'voice.wav')) ? `videos/${slug}/voice.wav` : undefined,

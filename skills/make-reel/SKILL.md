@@ -51,8 +51,20 @@ rsync -a --exclude node_modules --exclude public/videos --exclude public/brand \
 `list_businesses`: each has a brand kit (`name`, `website`, `about` — what it sells and to
 whom —, `handle`, `accent`) and its own channels. If there is more than one and the request
 does not say which, ask. Write the video's brand kit to
-`<studio>/public/videos/<slug>/brand.json` as `{ "name", "handle", "accent", "tone" }`, where
-`tone` is the style (`dark` or `light`). Write the script from `about`; if it is empty, ask
+`<studio>/public/videos/<slug>/brand.json` as `{ "name", "handle", "accent", "style" }`.
+
+**Style.** Every video has one of three styles (ask, or use the one from the order):
+
+- `explainer3d` — **3D explainer.** Each shot is a 3D scene in dark space under a spotlight
+  (`<Stage3D>` as the shot's `scene`, with `Pedestal`, `Block`, `Orb`, `Screen`, `Pillar`,
+  `Coin`, `Burst`), and the headline runs as captions at the bottom with the spoken word
+  boxed. Move the camera differently in every shot. Best for "how it works" and big ideas.
+- `paper` — **Paper + presenter.** Warm paper, a chapter label, a left-aligned headline whose
+  highlighted words turn into accent serif italics, and a cartoon presenter in the corner who
+  talks along and gestures at every sentence. Product cards and screens float on the paper.
+  Best for advice, stories and opinions. Leave the bottom right free for the presenter.
+- `motion` — **Motion graphics.** Bold product screens, numbers and stamps on dark and light
+  shots. Best for product walkthroughs and results. Write the script from `about`; if it is empty, ask
 what the business sells and suggest filling in the brand kit in Pulsly. Real product
 screenshots in `<studio>/public/brand/` make the best proof: ask for them.
 
@@ -111,8 +123,9 @@ Read `words.json` and the script, then write a beat sheet (in your head or a scr
 
 ## 5. Write the video in code
 
-Read `kit.md` next to this skill (the components) and
-`<studio>/src/videos/example.tsx` (a finished video) first. Then write
+Read `kit.md` next to this skill (the components) and the finished example of the video's
+style first: `<studio>/src/videos/example-3d.tsx`, `example-paper.tsx` or `example.tsx`
+(motion). Then write
 `<studio>/src/videos/<slug>.tsx`:
 
 ```tsx

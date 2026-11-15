@@ -52,6 +52,8 @@ export interface ShotProps {
   from: Cue;
   tone?: Tone;
   headline?: HeadlineSpec;
+  /** A full-frame scene behind everything, e.g. a <Stage3D> in the explainer3d style. */
+  scene?: ReactNode;
   /** Small chapter label at the top left, e.g. "01 · the proof". */
   chapter?: string;
   /** How this shot cuts in. Defaults rotate through all of them. */
@@ -70,11 +72,13 @@ function ShotFrame({
   chapter,
   transition,
   children,
-}: Pick<ShotProps, 'headline' | 'chapter' | 'children'> & { transition: Transition }) {
+  scene,
+}: Pick<ShotProps, 'headline' | 'chapter' | 'children' | 'scene'> & { transition: Transition }) {
   const frame = useCurrentFrame();
   const { durationInFrames } = useVideoConfig();
   const { lead } = useShotTiming();
   const colors = useColors();
+  const { style } = useBrand();
   const clamp = { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' } as const;
   // The very first shot is the thumbnail and the hook: it is there from frame 0.
   const t = lead === 0 ? 1 : interpolate(frame, [0, lead], [0, 1], clamp);
@@ -85,6 +89,7 @@ function ShotFrame({
   return (
     <AbsoluteFill style={transitionStyle(transition, t)}>
       <Background />
+      {scene}
       {lead > 0 && <Sfx name="whoosh" at={0} />}
       {chapter && (
         <div
@@ -104,8 +109,9 @@ function ShotFrame({
       {headline && <Headline {...headline} />}
       <AbsoluteFill
         style={{
-          top: headline ? 330 : 200,
-          bottom: 360,
+          top: headline && style !== 'explainer3d' ? 330 : 200,
+          // Paper leaves room for the presenter, 3D for the captions.
+          bottom: { motion: 360, paper: 600, explainer3d: 420 }[style],
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',

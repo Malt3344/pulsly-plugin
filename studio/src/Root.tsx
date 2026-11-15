@@ -1,11 +1,9 @@
 import { Composition } from 'remotion';
 import {
   COLUMNS,
+  Contact,
+  contactHeight,
   GAP,
-  LABEL,
-  makeContact,
-  PER_PAGE,
-  TILE_HEIGHT,
   TILE_WIDTH,
   type ContactProps,
 } from './Contact';
@@ -22,10 +20,8 @@ const durationOf = (props: VideoProps) => {
 const defaults: VideoProps = {
   slug: 'example',
   words: [],
-  brand: { accent: '#3fe0b0', tone: 'dark' },
+  brand: { accent: '#3fe0b0', style: 'motion', tone: 'dark' },
 };
-
-const Contact = makeContact(CurrentVideo);
 
 /** "Reel" is the video; "Contact" is the contact sheet used to check it. */
 export function Root() {
@@ -47,27 +43,11 @@ export function Root() {
         id="Contact"
         component={Contact}
         width={GAP + COLUMNS * (TILE_WIDTH + GAP)}
-        height={GAP + 3 * (TILE_HEIGHT + LABEL + GAP)}
+        height={contactHeight(1)}
         fps={FPS}
-        durationInFrames={FPS * 10}
-        defaultProps={
-          { ...defaults, interval: 1, page: 1, durationInSeconds: 10 } satisfies ContactProps
-        }
-        calculateMetadata={({ props }) => {
-          const durationInSeconds = durationOf(props);
-          const tiles = Math.min(
-            PER_PAGE,
-            Math.floor(durationInSeconds / props.interval) + 1 - (props.page - 1) * PER_PAGE,
-          );
-          const rows = Math.ceil(Math.max(1, tiles) / COLUMNS);
-
-          return {
-            props: { ...props, durationInSeconds },
-            // As long as the video, so every frame exists when <Freeze> jumps to it.
-            durationInFrames: Math.ceil(durationInSeconds * FPS),
-            height: GAP + rows * (TILE_HEIGHT + LABEL + GAP),
-          };
-        }}
+        durationInFrames={1}
+        defaultProps={{ tiles: [] } satisfies ContactProps}
+        calculateMetadata={({ props }) => ({ height: contactHeight(props.tiles.length) })}
       />
     </>
   );
