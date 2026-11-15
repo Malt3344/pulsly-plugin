@@ -47,10 +47,14 @@ rsync -a --exclude node_modules --exclude public/videos --exclude public/brand \
   "${CLAUDE_PLUGIN_ROOT}/studio/" ./pulsly-studio/ && (cd pulsly-studio && npm install)
 ```
 
-**Brand kit.** If `<studio>/brand.json` does not exist, ask once for the brand name, the
-social handle (e.g. `@pulsly`), a brand colour and whether they prefer a `dark` or `light`
-look, and write it (see `brand.example.json`). Ask for real product screenshots in
-`<studio>/public/brand/`: real screens make the best proof.
+**Business and brand kit.** Every video is for one of the user's businesses. Call
+`list_businesses`: each has a brand kit (`name`, `website`, `about` — what it sells and to
+whom —, `handle`, `accent`) and its own channels. If there is more than one and the request
+does not say which, ask. Write the video's brand kit to
+`<studio>/public/videos/<slug>/brand.json` as `{ "name", "handle", "accent", "tone" }`, where
+`tone` is the style (`dark` or `light`). Write the script from `about`; if it is empty, ask
+what the business sells and suggest filling in the brand kit in Pulsly. Real product
+screenshots in `<studio>/public/brand/` make the best proof: ask for them.
 
 The voice is Kokoro, free and local. The default is `am_michael`; other voices can be set in
 `<studio>/.env` (e.g. `am_adam`, `af_heart`, `bm_george`). Music is generated on install and
@@ -182,8 +186,11 @@ go-ahead before posting.
 Videos never go straight to the socials: they wait in Pulsly until the user has watched them
 and pressed approve.
 
-1. `list_channels` and ask which channels to post to (default: all active ones) and when (now or
-   a date and time — convert it to ISO 8601 with the user's timezone).
+For videos ordered in Pulsly, use `deliver_video` instead (see below). Otherwise:
+
+1. Take the business's channels from `list_businesses` and ask which to post to (default: all
+   active ones) and when (now or a date and time — convert it to ISO 8601 with the user's
+   timezone). Never mix channels of two businesses in one post.
 2. Upload the video:
    - Get the size with `wc -c < public/videos/<slug>/reel.mp4`.
    - `create_media_upload` with `filename: "<slug>.mp4"`, `contentType: "video/mp4"` and the size.
@@ -212,43 +219,27 @@ product"):
    (day, hook, review link) and tell the user they are waiting in Pulsly under
    **Posts → Needs review**.
 
-## Autopilot
+## Videos ordered in Pulsly
 
-### Turning autopilot on and off
+The user orders videos in the Pulsly app: a business, a style, what they are about, how many,
+and what happens when they are ready. When they say "Make my Pulsly videos", or a run starts
+with `pulsly-helper:` (the hourly helper, with nobody watching):
 
-When the user asks to turn on autopilot (e.g. "Turn on autopilot: every Sunday make 5 videos
-about … , one per day at 9:00, post to …"), set up a weekly task on their computer yourself,
-two hours before the first post, that runs in the current folder:
+1. `list_video_requests`. If it is empty, say so in one line and stop.
+2. For each request, oldest first: `start_video_request`, then make `count` videos for its
+   `business` in its `style` about its `topic`, with steps 2–7 (slugs like
+   `<business>-<topic>-1`). Give each video a fresh angle and check `list_posts` with the
+   `businessId` so hooks are not repeated.
+3. Upload each video (step 8.2) and call `deliver_video` with the request id, the video's
+   `number` (1, 2, …), the media id, a caption and a YouTube title. Pulsly applies the
+   channels and timing the user chose.
+4. `finish_video_request` with `DONE` and a one-line summary, or `FAILED` and what went wrong.
 
-```
-claude -p "autopilot: <what to make, how many, when, style, channel ids>" --allowedTools Bash Read Write Edit <pulsly tools>
-```
+The user already chose everything in Pulsly, so skip the checkpoints in steps 2 and 7 and
+never wait for an answer; always do the checks in steps 6 and 7. In a `pulsly-helper:` run, end
+with a short summary (business, hooks, where the videos went) for the log. If something fails,
+finish the request as `FAILED` instead of retrying endlessly.
 
-`<pulsly tools>` is `mcp__pulsly` in a downloaded Pulsly folder and `mcp__plugin_pulsly_pulsly`
-in the plugin. Append the output to `autopilot.log` in the folder.
-
-- **macOS:** a LaunchAgent at `~/Library/LaunchAgents/co.pulsly.autopilot.plist` running
-  `/bin/zsh -lc "cd '<folder>' && …"` with a `StartCalendarInterval`, then `launchctl load` it
-  (launchd catches up on runs missed while the Mac slept).
-- **Windows:** a weekly Task Scheduler task named "Pulsly autopilot" (`schtasks /Create … /SC
-WEEKLY`) that runs the command in the folder.
-- **Linux:** a crontab line tagged `# pulsly-autopilot`.
-
-Tell the user in one sentence what will happen and that the computer must be on. To turn it
-off, remove that task. Autopilot runs Claude without asking for permission in this folder;
-mention it, and that every video still waits for their approval in Pulsly.
-
-### Autopilot runs
-
-A request that starts with `autopilot:` comes from a scheduled run with nobody watching.
-Then:
-
-- Never ask questions or wait for approval; the checkpoints in steps 2 and 7 are skipped, but
-  always do the checks in steps 6 and 7.
-- Use the channels, style, number of videos and posting time from the request. Pick a fresh
-  angle for each video: check `list_posts` and avoid repeating recent hooks.
-- Set up the studio (step 1) if it is not installed yet.
-- Send every video with `schedule_post` at the suggested times. They wait in Pulsly for the
-  user's approval; that is expected.
-- End with a short summary (day, hook, channels) so the log shows what was made. If something
-  fails, stop and explain it in the log instead of retrying endlessly.
+Autopilot is part of the order in Pulsly (it is ordered again every week), so there is nothing
+to schedule on the computer except the hourly helper from `SETUP.md`. If the user asks for
+autopilot here, point them to **Videos → Autopilot** in Pulsly.

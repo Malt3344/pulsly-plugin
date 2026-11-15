@@ -1,5 +1,6 @@
 // Prepares a video for rendering: points src/current.ts at src/videos/<slug>.tsx and
 // writes the props (brand kit, voiceover, word timings) to public/videos/<slug>/.props.json.
+// The brand kit is public/videos/<slug>/brand.json (the video's business), else brand.json.
 import { existsSync } from 'node:fs';
 import { readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
@@ -18,7 +19,8 @@ export const prepare = async (slug) => {
   );
 
   const dir = join('public', 'videos', slug);
-  const brandKit = existsSync('brand.json') ? await readJson('brand.json') : {};
+  const brandPath = [join(dir, 'brand.json'), 'brand.json'].find((path) => existsSync(path));
+  const brandKit = brandPath ? await readJson(brandPath) : {};
   const props = {
     slug,
     brand: {
