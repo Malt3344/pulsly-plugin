@@ -68,8 +68,8 @@ does not say which, ask. Write the video's brand kit to
   what the business sells and suggest filling in the brand kit in Pulsly. Real product
   screenshots in `<studio>/public/brand/` make the best proof: ask for them.
 
-The voice is Kokoro, free and local. The default is `am_michael`; other voices can be set in
-`<studio>/.env` (e.g. `am_adam`, `af_heart`, `bm_george`). Music is generated on install and
+The voice is the user's own ElevenLabs account (`ELEVENLABS_API_KEY` in `<studio>/.env`, set
+up in `SETUP.md`), with the free local Kokoro voice as a fallback. Music is generated on install and
 the sound effects are CC0 recordings; there is nothing to license.
 
 If the Pulsly tools (`list_channels` and the others) are not available, ask the user to type
@@ -98,22 +98,17 @@ Pick a short slug (e.g. `sell-the-job`). Write the voiceover to
 
 ## 3. Record the voice
 
-Use the studio-quality voice first: call `create_voiceover` with the whole script, then
-
-```bash
-cd <studio> && curl -sSfo public/videos/<slug>/voice.mp3 "<audioUrl>" \
-  && curl -sSfo public/videos/<slug>/words.json "<wordsUrl>"
-```
-
-`words.json` has every word with `start`/`end` seconds. If `create_voiceover` is not available
-or fails (e.g. the monthly allowance is used up), record the free local voice instead:
-
 ```bash
 cd <studio> && npm run voice -- <slug>
 ```
 
-That writes `voice.wav` and `words.json` (the first run downloads a ~90 MB voice model). Use
-only one of the two: delete a `voice.mp3` before falling back to `voice.wav`.
+With the user's ElevenLabs key in `<studio>/.env` this records a studio-quality voice
+(`voice.mp3`); without it, the free local voice (`voice.wav`, ~90 MB model on the first run).
+Either way it writes `words.json` with every word's `start`/`end` seconds. If ElevenLabs fails,
+tell the user the reason it prints (key not accepted, out of credits) in one sentence; in an
+unattended run, remove `ELEVENLABS_API_KEY` from the command's environment
+(`ELEVENLABS_API_KEY= npm run voice -- <slug>`) to fall back to the local voice and mention it
+in the summary.
 
 ## 4. Plan the beats
 

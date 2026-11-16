@@ -8,6 +8,8 @@ import { fileURLToPath } from 'node:url';
 
 const FOLDER = dirname(fileURLToPath(import.meta.url));
 const TOKEN_FILE = join(FOLDER, '.pulsly-helper');
+/** Optional: a token from `claude setup-token`, for computers where Claude is not logged in. */
+const CLAUDE_TOKEN_FILE = join(FOLDER, '.pulsly-claude-token');
 const LOG_FILE = join(FOLDER, 'pulsly-helper.log');
 const API_URL = process.env.PULSLY_API_URL ?? 'https://api.pulsly.co';
 
@@ -22,8 +24,7 @@ const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 const log = (message) =>
   appendFileSync(LOG_FILE, `[${new Date().toISOString()}] ${message}\n`, 'utf8');
 
-const readToken = () =>
-  existsSync(TOKEN_FILE) ? readFileSync(TOKEN_FILE, 'utf8').trim() : undefined;
+const readFile = (path) => (existsSync(path) ? readFileSync(path, 'utf8').trim() : undefined);
 
 /** How many videos are waiting, or undefined when Pulsly cannot be reached. */
 const pendingVideos = async (token) => {
@@ -46,9 +47,11 @@ const pendingVideos = async (token) => {
 const runClaude = () =>
   new Promise((resolve) => {
     log('Videos are waiting: starting Claude.');
+    const claudeToken = readFile(CLAUDE_TOKEN_FILE);
     const claude = spawn('claude', ['-p', PROMPT, '--allowedTools', ...TOOLS], {
       cwd: FOLDER,
       shell: process.platform === 'win32',
+      env: claudeToken ? { ...process.env, CLAUDE_CODE_OAUTH_TOKEN: claudeToken } : process.env,
     });
     // Keep a Mac awake while Claude works, so the video is not cut off by sleep.
     const awake =
@@ -73,14 +76,16 @@ const runClaude = () =>
 log('Pulsly helper started.');
 
 for (;;) {
-  const token = readToken();
+  const token = readFile(TOKEN_FILE);
   const pending = token ? await pendingVideos(token) : undefined;
 
   if (pending > 0) {
     const code = await runClaude();
-    if (code !== 0) {
-      await sleep(BACK_OFF_MS);
-    }
+    // Back off when Claude failed (e.g. its usage limit) or left the videos unmade, instead of
+    // starting it again and again.
+    const stillPending = await pendingVideos(token);
+    const madeProgress = code === 0 && !(stillPending >= pending);
+    await sleep(madeProgress ? CHECK_EVERY_MS : BACK_OFF_MS);
   } else {
     await sleep(CHECK_EVERY_MS);
   }
