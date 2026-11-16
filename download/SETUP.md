@@ -31,24 +31,29 @@ Check whether the Pulsly tools are available by calling `list_businesses`.
 
 ## 4. Start the Pulsly helper
 
-Set up a task on the user's computer that runs every hour and makes the videos they order in
-Pulsly. It runs in this folder:
+The helper (`helper.mjs` in this folder) runs in the background and starts Claude the moment
+the user orders a video in Pulsly. It checks Pulsly every 20 seconds without using any of the
+user's Claude plan; Claude only runs when there is something to make.
 
-```
-claude -p "pulsly-helper: make the videos ordered in Pulsly" --allowedTools Bash Read Write Edit mcp__pulsly
-```
+1. Call `create_helper_token` and write the token to `.pulsly-helper` in this folder.
+2. Make it start on login and keep running, with `node` from `which node` (or `where node`) as
+   an absolute path, in this folder:
+   - **macOS:** a LaunchAgent at `~/Library/LaunchAgents/co.pulsly.helper.plist` with
+     `ProgramArguments` `[<node>, <this folder>/helper.mjs]`, `WorkingDirectory` this folder,
+     `RunAtLoad` and `KeepAlive` true, and an `EnvironmentVariables` `PATH` that includes the
+     folders of `node` and `claude` (`which claude`). Then
+     `launchctl bootstrap gui/$(id -u) <plist>`.
+   - **Windows:** a Task Scheduler task named "Pulsly helper" that runs at log on, hidden
+     (`schtasks /Create /SC ONLOGON /TN "Pulsly helper" /TR "<node> \"<this folder>\helper.mjs\""`),
+     then start it once with `schtasks /Run /TN "Pulsly helper"`.
+   - **Linux:** a systemd user service `pulsly-helper` (`systemctl --user enable --now`).
+3. Check that `pulsly-helper.log` says "Pulsly helper started."
 
-Append its output to `pulsly-helper.log` in this folder.
-
-- **macOS:** a LaunchAgent at `~/Library/LaunchAgents/co.pulsly.helper.plist` that runs
-  `/bin/zsh -lc "cd '<this folder>' && …"` with `StartInterval` 3600, then `launchctl load` it.
-- **Windows:** a Task Scheduler task named "Pulsly helper" (`schtasks /Create /SC HOURLY …`)
-  that runs the command in this folder.
-- **Linux:** a crontab line `0 * * * *` tagged `# pulsly-helper`.
-
-If a helper task already exists, leave it. Tell the user in one sentence: while the computer is
-on, Claude checks Pulsly every hour and makes the videos they order there. To stop it, they can
-say "Stop the Pulsly helper" and you remove the task.
+If an old hourly task from an earlier version exists (`co.pulsly.autopilot`, "Pulsly
+autopilot", `# pulsly-helper` in crontab, or `co.pulsly.helper` with `StartInterval`), remove
+it first. Tell the user in one sentence: while the computer is on, Claude starts on its own
+within seconds of an order in Pulsly. To stop it, they say "Stop the Pulsly helper" and you
+remove the service.
 
 ## 5. Done
 

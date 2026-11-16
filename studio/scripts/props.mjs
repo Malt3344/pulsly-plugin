@@ -34,7 +34,10 @@ export const prepare = async (slug) => {
       presenter: brandKit.presenter,
     },
     music: brandKit.music ?? true,
-    audio: existsSync(join(dir, 'voice.wav')) ? `videos/${slug}/voice.wav` : undefined,
+    // The ElevenLabs voiceover (voice.mp3) wins over the local voice (voice.wav).
+    audio: ['voice.mp3', 'voice.wav']
+      .filter((file) => existsSync(join(dir, file)))
+      .map((file) => `videos/${slug}/${file}`)[0],
     words: existsSync(join(dir, 'words.json')) ? await readJson(join(dir, 'words.json')) : [],
   };
   const path = join(dir, '.props.json');

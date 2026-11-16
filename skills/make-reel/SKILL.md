@@ -98,12 +98,22 @@ Pick a short slug (e.g. `sell-the-job`). Write the voiceover to
 
 ## 3. Record the voice
 
+Use the studio-quality voice first: call `create_voiceover` with the whole script, then
+
+```bash
+cd <studio> && curl -sSfo public/videos/<slug>/voice.mp3 "<audioUrl>" \
+  && curl -sSfo public/videos/<slug>/words.json "<wordsUrl>"
+```
+
+`words.json` has every word with `start`/`end` seconds. If `create_voiceover` is not available
+or fails (e.g. the monthly allowance is used up), record the free local voice instead:
+
 ```bash
 cd <studio> && npm run voice -- <slug>
 ```
 
-Writes `voice.wav` and `words.json` (every word with `start`/`end` seconds). Pauses between
-sentences are trimmed to keep the pace up. The first run downloads the voice model (~90 MB).
+That writes `voice.wav` and `words.json` (the first run downloads a ~90 MB voice model). Use
+only one of the two: delete a `voice.mp3` before falling back to `voice.wav`.
 
 ## 4. Plan the beats
 
@@ -234,25 +244,29 @@ product"):
 
 ## Videos ordered in Pulsly
 
-The user orders videos in the Pulsly app: a business, a style, what they are about, how many,
-and what happens when they are ready. When they say "Make my Pulsly videos", or a run starts
-with `pulsly-helper:` (the hourly helper, with nobody watching):
+The user orders videos in the Pulsly app: one at a time in **Studio** (they watch it before it
+is posted), or every week from the **Content engine** (posted automatically). When they say
+"Make my Pulsly videos", or a run starts with `pulsly-helper:` (started by the helper the
+moment something is ordered, with nobody watching):
 
 1. `list_video_requests`. If it is empty, say so in one line and stop.
-2. For each request, oldest first: `start_video_request`, then make `count` videos for its
+2. For each request, oldest first: `start_video_request`, then make the videos in
+   `videosToMake` (a request that was interrupted keeps the ones already delivered) for its
    `business` in its `style` about its `topic`, with steps 2–7 (slugs like
    `<business>-<topic>-1`). Give each video a fresh angle and check `list_posts` with the
    `businessId` so hooks are not repeated.
-3. Upload each video (step 8.2) and call `deliver_video` with the request id, the video's
-   `number` (1, 2, …), the media id, a caption and a YouTube title. Pulsly applies the
-   channels and timing the user chose.
+3. Deliver each video as soon as it is rendered, before starting the next: upload it (step
+   8.2) and call `deliver_video` with the request id, the video's `number`, the media id, a
+   caption and a YouTube title. Pulsly applies the channels and timing the user chose.
 4. `finish_video_request` with `DONE` and a one-line summary, or `FAILED` and what went wrong.
 
 The user already chose everything in Pulsly, so skip the checkpoints in steps 2 and 7 and
 never wait for an answer; always do the checks in steps 6 and 7. In a `pulsly-helper:` run, end
 with a short summary (business, hooks, where the videos went) for the log. If something fails,
-finish the request as `FAILED` instead of retrying endlessly.
+finish the request as `FAILED` instead of retrying endlessly. If Claude's usage limit stops the
+run, leave the request as it is: Pulsly hands it out again after a few hours and the helper
+picks it up, so only the missing videos are made.
 
-Autopilot is part of the order in Pulsly (it is ordered again every week), so there is nothing
-to schedule on the computer except the hourly helper from `SETUP.md`. If the user asks for
-autopilot here, point them to **Videos → Autopilot** in Pulsly.
+Weekly videos come from the Content engine in Pulsly, so there is nothing to schedule on the
+computer except the helper from `SETUP.md`. If the user asks for autopilot here, point them to
+**Content engine** in Pulsly.
