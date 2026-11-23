@@ -97,7 +97,8 @@ also wait until after setup.
 ## Step 5 of 6 — start videos automatically
 
 Tell them: "Last technical bit: I'm adding a small helper that starts me the moment you order a
-video in Pulsly." Then:
+video in Pulsly. It also downloads YouTube links for Clips over your own connection, because
+YouTube blocks servers." Then:
 
 1. Call `create_helper_token` and write the token to `.pulsly-helper` in this folder.
 2. The helper runs Claude from the command line. Run `claude --version`; if it is missing,
