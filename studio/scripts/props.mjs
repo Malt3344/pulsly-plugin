@@ -6,7 +6,15 @@ import { readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 
 /** The default shot tone of each style (see src/kit/theme.tsx). */
-const STYLE_TONE = { motion: 'dark', paper: 'paper', explainer3d: 'space' };
+const STYLE_TONE = {
+  motion: 'dark',
+  paper: 'paper',
+  explainer3d: 'space',
+  blocky: 'light',
+  gameplay: 'dark',
+  chat: 'dark',
+  quiz: 'dark',
+};
 
 const readJson = async (path) => JSON.parse(await readFile(path, 'utf8'));
 

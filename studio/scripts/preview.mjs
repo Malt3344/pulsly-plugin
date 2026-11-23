@@ -1,5 +1,7 @@
 // Renders contact sheets with a still every second: public/videos/<slug>/preview-1.jpg, -2…
 // Look at them to check the video before the full render. Usage: npm run preview -- <slug>
+// To look closer, add seconds: `npm run preview -- <slug> 3.5 8` renders those two moments
+// at half size as public/videos/<slug>/still-3.5.jpg and still-8.jpg instead.
 // Each still is a real frame of the video (3D scenes included), then they are laid out
 // in a grid by the Contact composition.
 import { readFile } from 'node:fs/promises';
@@ -13,7 +15,8 @@ const PER_PAGE = 18;
 const TILE_SCALE = 0.2;
 const chromiumOptions = { gl: 'angle' };
 
-const { dir, path, props } = await prepare(process.argv[2]);
+const [slug, ...moments] = process.argv.slice(2);
+const { dir, path, props } = await prepare(slug);
 const inputProps = { ...JSON.parse(await readFile(path, 'utf8')), audio: undefined, music: false };
 const serveUrl = await bundle({ entryPoint: resolve('src/index.ts') });
 const browser = await openBrowser('chrome', { chromiumOptions });
@@ -23,6 +26,17 @@ const reel = await selectComposition({ ...common, id: 'Reel', inputProps });
 const last = props.words[props.words.length - 1];
 const duration = Math.min((last ? last.end : 10) + 0.5, reel.durationInFrames / reel.fps);
 const times = Array.from({ length: Math.floor(duration / INTERVAL) + 1 }, (_, i) => i * INTERVAL);
+
+if (moments.length > 0) {
+  for (const moment of moments) {
+    const frame = Math.min(reel.durationInFrames - 1, Math.round(Number(moment) * reel.fps));
+    const output = join(dir, `still-${moment}.jpg`);
+    await renderStill({ ...common, composition: reel, inputProps, frame, scale: 0.5, output });
+    console.log(`Still: ${output}`);
+  }
+  await browser.close({ silent: true });
+  process.exit(0);
+}
 
 const tiles = [];
 for (const seconds of times) {

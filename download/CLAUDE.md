@@ -4,7 +4,9 @@ This folder turns Claude into a video studio for the user's businesses. Videos a
 and sent to Pulsly, which posts them to the business's channels.
 
 - When the user asks to set up (e.g. "Set up Pulsly for me"), follow `SETUP.md` step by step.
-  For "Add my ElevenLabs key", do step 3 of it on its own.
+- The voice is set up in Pulsly, not here: for "Add my ElevenLabs key" or "change the voice",
+  send them to **https://app.pulsly.co/settings#voice** (4 short steps there). Never ask them
+  to paste a key in this chat.
 - When something seems stuck (a video waiting for long, the voice failing), check
   `pulsly-helper.log`, `list_video_requests` and the helper service, explain what you found
   in one or two plain sentences and fix it with the user, one step at a time.

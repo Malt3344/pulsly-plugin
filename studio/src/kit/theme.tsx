@@ -17,9 +17,18 @@ export const fonts = {
 /**
  * The look of a whole video. `motion`: bold motion graphics, alternating dark and light
  * shots. `paper`: warm paper with a talking presenter. `explainer3d`: 3D scenes in a dark
- * space under spotlights, with captions.
+ * space under spotlights, with captions. The template styles (`blocky`, `gameplay`, `chat`,
+ * `quiz`) are filled from a typed spec instead of drawn shot by shot: see src/styles/.
  */
-export const STYLES = ['motion', 'paper', 'explainer3d'] as const;
+export const STYLES = [
+  'motion',
+  'paper',
+  'explainer3d',
+  'blocky',
+  'gameplay',
+  'chat',
+  'quiz',
+] as const;
 export type Style = (typeof STYLES)[number];
 
 export const TONES = ['dark', 'light', 'paper', 'space'] as const;
@@ -74,6 +83,10 @@ export const STYLE_TONE: Record<Style, Tone> = {
   motion: 'dark',
   paper: 'paper',
   explainer3d: 'space',
+  blocky: 'light',
+  gameplay: 'dark',
+  chat: 'dark',
+  quiz: 'dark',
 };
 
 export type Palette = (typeof palettes)[Tone];

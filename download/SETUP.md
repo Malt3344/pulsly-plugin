@@ -3,18 +3,18 @@
 You are setting up the content machine for someone who may never have used a terminal. Do all
 the technical work yourself. Guide them like this:
 
-- **One step at a time.** Start every message with where they are, e.g. "Step 2 of 6 — the
-  voice". Give them only that step, then wait until they say it is done.
+- **One step at a time.** Start every message with where they are, e.g. "Step 2 of 5 — the
+  video studio". Give them only that step, then wait until they say it is done.
 - **Exact clicks.** Name every button and field exactly as it reads on screen, in **bold**,
   in numbered steps. Never "configure", "API" or "terminal" without saying what to click.
 - **Check, then confirm.** After each step, check it worked yourself and say so ("✓ The voice
   works"). If something failed, say what to try next in one sentence.
 - Use their language. Keep every message short.
 
-Start with one message that says what is about to happen: "I'll set up Pulsly with you in 6
+Start with one message that says what is about to happen: "I'll set up Pulsly with you in 5
 short steps, about 10 minutes. You'll only need to click a few things; I do the rest."
 
-## Step 1 of 6 — Node.js
+## Step 1 of 5 — Node.js
 
 Run `node -v` yourself. If it prints v22 or higher, say "✓ Your computer is ready" and go on.
 
@@ -29,7 +29,7 @@ Otherwise ask them to:
 
 Stop here until Node.js is installed.
 
-## Step 2 of 6 — the video studio
+## Step 2 of 5 — the video studio
 
 Tell them: "I'm installing the video tools now. This takes 2–5 minutes; you don't need to do
 anything." Then run:
@@ -41,41 +41,7 @@ cd studio && npm install
 If `studio/.env` does not exist, copy `studio/.env.example` to `studio/.env`. When it is done:
 "✓ The video studio is installed."
 
-## Step 3 of 6 — the voice (ElevenLabs)
-
-The videos use their own ElevenLabs account for a natural voice. Tell them:
-
-> Your videos are voiced by ElevenLabs, the most natural AI voice. You use your own account,
-> so the voice is yours. The free plan is fine to try it; to post videos for your business,
-> ElevenLabs asks for a paid plan (Starter is about $5 a month; see elevenlabs.io/pricing).
->
-> 1. Open **https://elevenlabs.io** and click **Sign up** (or **Log in** if you have an
->    account). Google sign-in is the quickest.
-> 2. Open **https://elevenlabs.io/app/developers/api-keys**. (Or: click **Developers** at the
->    bottom left, then the **API Keys** tab.)
-> 3. Click **Create Key**.
-> 4. Name it **Pulsly**.
-> 5. Under permissions, set **Text to Speech** to **Access**. Leave the rest as it is.
-> 6. Click **Create**, then **Copy**.
-> 7. Paste the key here in the chat and send it.
->
-> The key stays on your computer and is only used to talk to ElevenLabs.
-
-When they paste it, write it to `studio/.env` as `ELEVENLABS_API_KEY=<key>` (replace the
-empty line, keep the rest), then check it:
-
-```bash
-cd studio && npm run voice -- --test
-```
-
-- If it works: "✓ The voice works." (It saved a sample at
-  `studio/public/videos/voice-test/voice.mp3`; offer to open it so they can hear it.)
-- If the key is not accepted: ask them to repeat 3–7 and make sure **Text to Speech** is set to
-  **Access**.
-- If they would rather skip this for now, leave the key empty: videos then use a free voice that
-  sounds more robotic. They can say "Add my ElevenLabs key" any time.
-
-## Step 4 of 6 — connect Pulsly
+## Step 3 of 5 — connect Pulsly
 
 Call `list_businesses`.
 
@@ -94,11 +60,10 @@ its TikTok, Instagram, Facebook or YouTube. If its brand kit is empty (no `about
 fill it in at **https://app.pulsly.co/business**: Claude writes every video from it. These can
 also wait until after setup.
 
-## Step 5 of 6 — start videos automatically
+## Step 4 of 5 — start videos automatically
 
 Tell them: "Last technical bit: I'm adding a small helper that starts me the moment you order a
-video in Pulsly. It also downloads YouTube links for Clips over your own connection, because
-YouTube blocks servers." Then:
+video in Pulsly." Then:
 
 1. Call `create_helper_token` and write the token to `.pulsly-helper` in this folder.
 2. The helper runs Claude from the command line. Run `claude --version`; if it is missing,
@@ -133,11 +98,17 @@ Remove old tasks from earlier versions first if they exist (`co.pulsly.autopilot
 autopilot", a `# pulsly-helper` crontab line). To stop the helper later, the user says "Stop the
 Pulsly helper" and you remove it.
 
-## Step 6 of 6 — your first video
+## Step 5 of 5 — your voice and your first video
 
 Tell them, in this order:
 
-> 🎉 Pulsly is ready.
+> 🎉 Pulsly is ready. One last thing for the best videos: your own voice.
+>
+> 1. Open **https://app.pulsly.co/settings#voice** and follow the 4 short steps there (an
+>    ElevenLabs account, then paste its key). Pick the voice you like; you can listen to each.
+>    Without it, videos use a free voice that sounds more robotic.
+>
+> Then make your first video:
 >
 > 1. Open **https://app.pulsly.co/studio**.
 > 2. Pick a style, write one line about what the video is about, and click **Make the video**.

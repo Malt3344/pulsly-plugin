@@ -45,7 +45,7 @@ const voiceLevel = (words: Word[], seconds: number) =>
     0,
   );
 
-function ProgressBar({ accent }: { accent: string }) {
+export function ProgressBar({ accent }: { accent: string }) {
   const frame = useCurrentFrame();
   const { durationInFrames } = useVideoConfig();
 
@@ -117,9 +117,37 @@ const timeShots = (children: ReactNode, words: Word[]) => {
   );
 };
 
+/** The voiceover with the music bed under it, ducked while the voice speaks. */
+export function Soundtrack({
+  audio,
+  words,
+  music = true,
+}: {
+  audio?: string;
+  words: Word[];
+  music?: boolean;
+}) {
+  const { fps } = useVideoConfig();
+
+  return (
+    <>
+      {audio && <Audio src={staticFile(audio)} />}
+      {music && (
+        <Audio
+          src={staticFile('music/bed.wav')}
+          loop
+          volume={(frame) =>
+            interpolate(frame, [0, 20], [0, 1], { extrapolateRight: 'clamp' }) *
+            (MUSIC - (MUSIC - MUSIC_UNDER_VOICE) * voiceLevel(words, frame / fps))
+          }
+        />
+      )}
+    </>
+  );
+}
+
 /** The root of every video: voiceover, music, brand and the shots. */
 export function Video({ props, children }: { props: VideoProps; children: ReactNode }) {
-  const { fps } = useVideoConfig();
   const { audio, words, brand, music = true } = props;
 
   return (
@@ -128,17 +156,7 @@ export function Video({ props, children }: { props: VideoProps; children: ReactN
         <AbsoluteFill style={{ backgroundColor: palettes[brand.tone].background }}>
           {timeShots(children, words)}
           {brand.style === 'paper' && brand.presenter !== false && <Presenter />}
-          {audio && <Audio src={staticFile(audio)} />}
-          {music && (
-            <Audio
-              src={staticFile('music/bed.wav')}
-              loop
-              volume={(frame) =>
-                interpolate(frame, [0, 20], [0, 1], { extrapolateRight: 'clamp' }) *
-                (MUSIC - (MUSIC - MUSIC_UNDER_VOICE) * voiceLevel(words, frame / fps))
-              }
-            />
-          )}
+          <Soundtrack audio={audio} words={words} music={music} />
           <ProgressBar accent={brand.accent} />
           {brand.handle && <Handle handle={brand.handle} />}
         </AbsoluteFill>

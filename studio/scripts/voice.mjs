@@ -1,7 +1,8 @@
 // Records public/videos/<slug>/script.txt as the voiceover, with word timings.
-// With ELEVENLABS_API_KEY in .env it uses ElevenLabs (voice.mp3); otherwise the free local
-// Kokoro voice (voice.wav). Usage: npm run voice -- <slug>
-// `npm run voice -- --test` records one sentence to check the ElevenLabs key.
+// The natural voice normally comes from Pulsly (the `record_voice` tool, with the user's own
+// ElevenLabs account). This script is the fallback: ElevenLabs when ELEVENLABS_API_KEY is in
+// .env (voice.mp3), otherwise the free local Kokoro voice (voice.wav).
+// Usage: npm run voice -- <slug>; `npm run voice -- --test` checks a key in .env.
 import { mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { recordWithElevenLabs } from './voice/elevenlabs.mjs';
@@ -37,9 +38,9 @@ const record = async () => {
     const { seconds, words } = await recordWithElevenLabs(text, dir, apiKey);
     console.log(`Wrote ${dir}/voice.mp3 with ElevenLabs (${seconds}s) and ${words} words`);
   } else if (testing) {
-    throw new Error('No ElevenLabs key yet: add ELEVENLABS_API_KEY to .env (see SETUP.md).');
+    throw new Error('No ElevenLabs key in .env. The voice is set up in Pulsly → Settings → Voice.');
   } else {
-    console.log('No ElevenLabs key in .env: using the free local voice.');
+    console.log('Using the free local voice.');
     await recordWithKokoro(text, dir);
   }
 };

@@ -1,6 +1,6 @@
 ---
 name: make-reel
-description: Turn an idea into a high-retention 9:16 motion-graphics reel — custom illustrations drawn to every spoken word, a voiceover, music and sound effects — and post it to the user's TikTok, Instagram, Facebook and YouTube channels through Pulsly. Use when the user wants to make, render or post a reel, short, TikTok or explainer video, or a batch of them.
+description: Turn an idea into a high-retention 9:16 reel — motion graphics, 3D, paper, blocky 3D stories, story-over-gameplay, text chats or quizzes, voiced, captioned, with music and sound effects — and post it to the user's TikTok, Instagram, Facebook and YouTube channels through Pulsly. Use when the user wants to make, render or post a reel, short, TikTok or explainer video, or a batch of them.
 ---
 
 # Make a reel
@@ -43,7 +43,7 @@ In the plugin, if `./pulsly-studio/package.json` has a lower version than
 
 ```bash
 rsync -a --exclude node_modules --exclude public/videos --exclude public/brand \
-  --exclude src/videos --exclude brand.json --exclude .env \
+  --include 'src/videos/example*' --exclude 'src/videos/*' --exclude brand.json --exclude .env \
   "${CLAUDE_PLUGIN_ROOT}/studio/" ./pulsly-studio/ && (cd pulsly-studio && npm install)
 ```
 
@@ -53,7 +53,8 @@ whom —, `handle`, `accent`) and its own channels. If there is more than one an
 does not say which, ask. Write the video's brand kit to
 `<studio>/public/videos/<slug>/brand.json` as `{ "name", "handle", "accent", "style" }`.
 
-**Style.** Every video has one of three styles (ask, or use the one from the order):
+**Style.** Every video has one of seven styles (ask, or use the one from the order). Three are
+drawn shot by shot with the kit:
 
 - `explainer3d` — **3D explainer.** Each shot is a 3D scene in dark space under a spotlight
   (`<Stage3D>` as the shot's `scene`, with `Pedestal`, `Block`, `Orb`, `Screen`, `Pillar`,
@@ -64,13 +65,28 @@ does not say which, ask. Write the video's brand kit to
   talks along and gestures at every sentence. Product cards and screens float on the paper.
   Best for advice, stories and opinions. Leave the bottom right free for the presenter.
 - `motion` — **Motion graphics.** Bold product screens, numbers and stamps on dark and light
-  shots. Best for product walkthroughs and results. Write the script from `about`; if it is empty, ask
-  what the business sells and suggest filling in the brand kit in Pulsly. Real product
-  screenshots in `<studio>/public/brand/` make the best proof: ask for them.
+  shots. Best for product walkthroughs and results.
 
-The voice is the user's own ElevenLabs account (`ELEVENLABS_API_KEY` in `<studio>/.env`, set
-up in `SETUP.md`), with the free local Kokoro voice as a fallback. Music is generated on install and
-the sound effects are CC0 recordings; there is nothing to license.
+Four are **templates**: you fill one typed spec and the template animates it, so they always look
+exactly like the style. Read `templates.md` next to this skill for them:
+
+- `blocky` — **Blocky 3D story.** Blocky toy characters act the story out in bright 3D game worlds
+  (park, city, school, house, obby, beach, space, shop), with game captions, speech bubbles and
+  cartoon effects. Best for stories and lessons with a twist.
+- `gameplay` — **Story + gameplay.** The story is told over a 3D parkour run with big captions and
+  the title on a post card. Best for storytime, confessions and drama.
+- `chat` — **Text chat.** A message thread that plays out with the voice. Best for funny or
+  dramatic exchanges and objections.
+- `quiz` — **Quiz.** Trivia with a countdown and the answer revealed on its word, or "would you
+  rather" with the results. Best for engagement.
+
+Write the script from `about`; if it is empty, ask what the business sells and suggest filling in
+the brand kit in Pulsly. Real product screenshots in `<studio>/public/brand/` make the best proof
+in the kit styles: ask for them.
+
+The voice is the user's own ElevenLabs account, connected in Pulsly (**Settings → Voice**, where
+they also pick the voice), with the free local Kokoro voice as a fallback. Music is generated on
+install and the sound effects are CC0 recordings; there is nothing to license.
 
 If the Pulsly tools (`list_channels` and the others) are not available, ask the user to type
 `/mcp`, choose **pulsly** → **Authenticate**, log in and click **Allow**.
@@ -98,21 +114,37 @@ Pick a short slug (e.g. `sell-the-job`). Write the voiceover to
 
 ## 3. Record the voice
 
+Call `record_voice` with the script's text. Pulsly records it with the user's own ElevenLabs
+voice and returns `voiceUrl` and `wordsUrl`; download both:
+
+```bash
+cd <studio> && rm -f public/videos/<slug>/voice.wav && \
+  curl -sSf -o public/videos/<slug>/voice.mp3 "<voiceUrl>" && \
+  curl -sSf -o public/videos/<slug>/words.json "<wordsUrl>"
+```
+
+`words.json` has every word's `start`/`end` seconds; everything is timed to it.
+
+If `record_voice` fails, it says why. No key yet: tell the user in one sentence that videos
+sound far better with their own voice and that they connect it in Pulsly → **Settings → Voice**
+(two minutes); out of credits: say so. Then record the free local voice instead (`voice.wav`,
+~90 MB model on the first run):
+
 ```bash
 cd <studio> && npm run voice -- <slug>
 ```
 
-With the user's ElevenLabs key in `<studio>/.env` this records a studio-quality voice
-(`voice.mp3`); without it, the free local voice (`voice.wav`, ~90 MB model on the first run).
-Either way it writes `words.json` with every word's `start`/`end` seconds. If ElevenLabs fails,
-tell the user the reason it prints (key not accepted, out of credits) in one sentence; in an
-unattended run, remove `ELEVENLABS_API_KEY` from the command's environment
-(`ELEVENLABS_API_KEY= npm run voice -- <slug>`) to fall back to the local voice and mention it
-in the summary.
+In an unattended run, never wait: fall back to the local voice and mention it in the summary.
 
 ## 4. Plan the beats
 
-Read `words.json` and the script, then write a beat sheet (in your head or a scratch file):
+**Template styles** (`blocky`, `gameplay`, `chat`, `quiz`): read `templates.md` and the style's
+example, then plan the spec instead of shots: which scene, actors, effects and camera go on which
+words (`blocky`), the messages (`chat`), the rounds and reveals (`quiz`) or the title
+(`gameplay`). Then write the video as in step 5 and continue at step 6.
+
+**Kit styles:** read `words.json` and the script, then write a beat sheet (in your head or a
+scratch file):
 
 1. **Shots.** Group the script into shots of one or two sentences (2–5 s each). Each shot
    has one illustration idea: a product screen, a metaphor (a vault for "the secret", a
@@ -128,9 +160,13 @@ Read `words.json` and the script, then write a beat sheet (in your head or a scr
 
 ## 5. Write the video in code
 
-Read `kit.md` next to this skill (the components) and the finished example of the video's
-style first: `<studio>/src/videos/example-3d.tsx`, `example-paper.tsx` or `example.tsx`
-(motion). Then write
+For a template style, copy its example (`example-blocky.tsx`, `example-gameplay.tsx`,
+`example-chat.tsx` or `example-quiz.tsx`) to `<studio>/src/videos/<slug>.tsx`, fill in the spec
+from your plan and run `npm run check`.
+
+For a kit style, read `kit.md` next to this skill (the components) and the finished example of
+the video's style first: `<studio>/src/videos/example-3d.tsx`, `example-paper.tsx` or
+`example.tsx` (motion). Then write
 `<studio>/src/videos/<slug>.tsx`:
 
 ```tsx
@@ -180,12 +216,16 @@ cd <studio> && npm run preview -- <slug>
 ```
 
 Renders `public/videos/<slug>/preview-1.jpg`, `-2.jpg`…: a still every second. **Open every
-page and look at every tile.** Fix the video and preview again until:
+page and look at every tile.** To look closer at a moment, add seconds:
+`npm run preview -- <slug> 3.5 8` renders `still-3.5.jpg` and `still-8.jpg` at half size. Fix the
+video and preview again until:
 
 - The first tile alone would stop someone scrolling.
 - Neighbouring tiles always differ: something new every second.
 - Nothing is cut off, overlapping, too small to read on a phone, or empty.
 - The headline shows the right words and highlights; the visual matches what is said.
+- Template styles: every effect, reveal, message and bubble lands on its word, and faces and
+  signs are readable.
 
 ## 7. Render — checkpoint
 
@@ -228,8 +268,8 @@ Use `list_posts` to check on progress when the user asks.
 When the user asks for several videos (for example "a week of explainer videos about my
 product"):
 
-1. Ask once for what the videos are about (product, audience, offer), the channels and the
-   posting time, and whether to use the `dark` or `light` style.
+1. Ask once for what the videos are about (product, audience, offer), the channels, the
+   posting time and the style.
 2. Propose one idea per video as a numbered list of hooks and get a single go-ahead.
 3. Make each video with steps 2–7, one slug per video (e.g. `week-1-mon`). Show the scripts
    together for one approval instead of stopping for each.

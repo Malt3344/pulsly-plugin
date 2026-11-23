@@ -1,7 +1,7 @@
 # Pulsly for Claude Code
 
-Turn an idea into a motion-graphics reel with your own Claude subscription and a free voice, then
-post it to TikTok, Instagram, Facebook and YouTube with [Pulsly](https://pulsly.co).
+Turn an idea into a reel with your own Claude subscription: motion graphics, 3D explainers,
+paper + presenter, blocky 3D stories, story + gameplay, text chats and quizzes. Then post it to TikTok, Instagram, Facebook and YouTube with [Pulsly](https://pulsly.co).
 
 ## Install
 
@@ -21,8 +21,9 @@ post it to TikTok, Instagram, Facebook and YouTube with [Pulsly](https://pulsly.
    /pulsly:make-reel a reel about why agencies should sell outcomes, not tools
    ```
 
-Requirements: Claude Code, Node 22+ and a [Pulsly](https://pulsly.co) account. The voice
-([Kokoro](https://huggingface.co/hexgrad/Kokoro-82M), Apache 2.0) runs on your computer for free.
+Requirements: Claude Code, Node 22+ and a [Pulsly](https://pulsly.co) account. Connect your own
+ElevenLabs voice in Pulsly under **Settings → Voice**; without it, a free voice
+([Kokoro](https://huggingface.co/hexgrad/Kokoro-82M), Apache 2.0) runs on your computer.
 
 ## What's inside
 
@@ -40,6 +41,7 @@ video in the browser with `npm run studio`.
 | Tool                    | What it does                                                             |
 | ----------------------- | ------------------------------------------------------------------------ |
 | `list_channels`         | Your connected channels                                                  |
+| `record_voice`          | Records a voiceover with your own ElevenLabs voice, with word timings    |
 | `create_media_upload`   | Returns a URL to upload a video or image to                              |
 | `complete_media_upload` | Confirms the upload                                                      |
 | `schedule_post`         | Sends a video to Pulsly for you to watch and approve before it is posted |

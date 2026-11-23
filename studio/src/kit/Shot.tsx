@@ -111,7 +111,9 @@ function ShotFrame({
         style={{
           top: headline && style !== 'explainer3d' ? 330 : 200,
           // Paper leaves room for the presenter, 3D for the captions.
-          bottom: { motion: 360, paper: 600, explainer3d: 420 }[style],
+          bottom:
+            ({ paper: 600, explainer3d: 420 } as Partial<Record<typeof style, number>>)[style] ??
+            360,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
